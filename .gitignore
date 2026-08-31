@@ -1,0 +1,26 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+*.egg
+.env
+.venv
+venv/
+.pytest_cache/
+.coverage
+*.tmp
+target/
+*.class
+/tmp/
+/scratch/
+/tests/out/
+# Generated artifacts (never commit)
+tests/fixtures/*/generated/
+tests/fixtures/*/target/
+# Logs
+*.log

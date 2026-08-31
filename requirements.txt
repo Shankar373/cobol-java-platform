@@ -1,0 +1,9 @@
+# Production runtime: Python Standard Library only (Python 3.10+).
+# No external third-party Python packages are required to RUN the platform.
+#
+# External tools (installed separately, not pip packages):
+#   Docker        - required to execute the GnuCOBOL container for COBOL baseline
+#   Maven 3.8+    - required to compile/execute generated Java projects
+#   JDK 17+       - required to compile/execute generated Java outside containers
+#
+# TEST-ONLY dependencies live in requirements-dev.txt

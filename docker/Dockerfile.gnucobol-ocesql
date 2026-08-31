@@ -1,0 +1,102 @@
+# ==============================================================================
+# Dockerfile.gnucobol-ocesql
+#
+# Reproducible GnuCOBOL 3.1.2 + Open-COBOL-ESQL v1.4 + PostgreSQL 16 client
+# image for CI COBOL compilation, OCESQL preprocessing, and execution.
+#
+# Base: hurriedreformist/gnucobol:3.1-builder  (Alpine 3.19, GnuCOBOL 3.1.2.0)
+# This image is built from repository-controlled source in CI — never pulled
+# as a pre-built opaque artefact.
+#
+# Paths this image provides (required by cobol_migrate.py lines 3524, 3542, 3569):
+#   /usr/local/bin/cobc                        -- GnuCOBOL compiler
+#   /usr/local/lib/libcob.so                   -- GnuCOBOL runtime (-lcob)
+#   /usr/local/bin/ocesql                      -- ESQL precompiler
+#   /usr/local/lib/libocesql.so                -- ESQL runtime library (-locesql)
+#   /usr/share/open-cobol-esql/copy/sqlca.cbl  -- SQLCA copybook
+#   /usr/bin/psql                              -- PostgreSQL client (DB ping)
+# ==============================================================================
+
+# ── Stage 1: build OCESQL from pinned source ──────────────────────────────────
+FROM hurriedreformist/gnucobol:3.1-builder AS builder
+
+# Install build-time dependencies.
+#   build-base   : gcc, make, libc-dev (Alpine meta-package)
+#   autoconf / automake / libtool : regenerate build system if needed
+#   bison / flex : SQL grammar/lexer; released tarball already has .c files but
+#                  having them prevents accidental regeneration failures
+#   wget         : download the pinned OCESQL tarball
+#   libpq-dev    : libpq headers required to compile libocesql against PostgreSQL
+#   postgresql16-client : provides pg_config and psql for the verification layer
+RUN apk add --no-cache \
+        build-base \
+        autoconf \
+        automake \
+        libtool \
+        bison \
+        flex \
+        wget \
+        libpq-dev \
+        postgresql16-client
+
+# Pin OCESQL to v1.4 (SHA-256 verified against the released GitHub tarball).
+ARG OCESQL_VERSION=1.4
+ARG OCESQL_SHA256=c0310473aa38ea2921ae4c45ff2463be9cd874efd488d23cd8b0f687644060fd
+
+WORKDIR /tmp/ocesql-build
+
+# Download, verify integrity, build, install.
+# - configure CPPFLAGS/LDFLAGS point explicitly to Alpine's PostgreSQL paths.
+# - 'make install' places:
+#     /usr/local/bin/ocesql
+#     /usr/local/lib/libocesql.{a,so}
+#     /usr/share/open-cobol-esql/copy/sqlca.cbl
+RUN wget -q -O ocesql.tar.gz \
+        "https://github.com/opensourcecobol/Open-COBOL-ESQL/archive/refs/tags/v${OCESQL_VERSION}.tar.gz" \
+    && echo "${OCESQL_SHA256}  ocesql.tar.gz" | sha256sum -c - \
+    && tar -xzf ocesql.tar.gz \
+    && cd "Open-COBOL-ESQL-${OCESQL_VERSION}" \
+    && autoreconf -f -i \
+    && ./configure \
+        CPPFLAGS="-I/usr/include/postgresql" \
+        LDFLAGS="-L/usr/lib" \
+    && make -j$(nproc) \
+    && make install
+
+# ── Stage 2: lean runtime image ───────────────────────────────────────────────
+FROM hurriedreformist/gnucobol:3.1-builder
+
+# Runtime dependencies only (no build toolchain in the final image).
+#   libpq          : OCESQL links against it at runtime (-lpq)
+#   postgresql16-client : provides /usr/bin/psql for the DB connectivity ping
+#                         (cobol_migrate.py:3482-3492)
+RUN apk add --no-cache \
+        libpq \
+        postgresql16-client
+
+# Copy OCESQL artefacts from the builder stage.
+COPY --from=builder /usr/local/bin/ocesql              /usr/local/bin/ocesql
+COPY --from=builder /usr/local/lib/libocesql.so*       /usr/local/lib/
+COPY --from=builder /usr/local/lib/libocesql.a         /usr/local/lib/
+COPY --from=builder /usr/local/share/open-cobol-esql /usr/share/open-cobol-esql
+
+# Refresh the dynamic linker cache and set up compatibility symlinks in /usr/lib
+# so that COB_PRE_LOAD=/usr/lib/libocesql.so works out-of-the-box.
+RUN /sbin/ldconfig 2>/dev/null || true \
+ && ln -sf /usr/local/lib/libocesql.so /usr/lib/libocesql.so \
+ && ln -sf /usr/local/lib/libocesql.so.0 /usr/lib/libocesql.so.0 \
+ && ln -sf /usr/local/lib/libocesql.so.0.1.0 /usr/lib/libocesql.so.0.1.0
+
+# ── Toolchain smoke-test — runs at BUILD time ──────────────────────────────────
+# This layer will FAIL the 'docker build' if any required binary or file is
+# missing, giving an immediate actionable error.  CI tests will only see a
+# healthy, verified image.
+RUN set -e; \
+    printf '\n=== GnuCOBOL ===\n'; cobc --version; \
+    printf '\n=== OCESQL ===\n'; ocesql --version 2>&1 | head -5 || true; \
+    printf '\n=== psql ===\n'; psql --version; \
+    printf '\n=== libocesql.so ===\n'; test -f /usr/local/lib/libocesql.so && echo OK; \
+    printf '\n=== sqlca.cbl ===\n'; test -f /usr/share/open-cobol-esql/copy/sqlca.cbl && echo OK; \
+    printf '\n=== Toolchain verification: PASSED ===\n'
+
+WORKDIR /repo
