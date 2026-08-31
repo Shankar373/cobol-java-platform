@@ -1486,6 +1486,7 @@ class CobolParser:
             
             self.consume("KEYWORD", "INTO", "Expected INTO keyword in STRING")
             tgt_tok = self.consume("IDENTIFIER", None, "Expected target identifier in STRING")
+            self.match("KEYWORD", "END-CALL")
             self.match("PUNCTUATION", ".")
             
             node = SemanticIRNode(
@@ -1694,7 +1695,7 @@ class CobolParser:
             args_info = []
             if self.match("KEYWORD", "USING"):
                 current_mode = "REFERENCE"
-                while not self.is_at_end() and not self.check("PUNCTUATION", ".") and not (self.check("KEYWORD") and self.peek().value.upper() in ("RETURNING", "GIVING")) and not is_tok_statement_start(self.peek()):
+                while not self.is_at_end() and not self.check("PUNCTUATION", ".") and not (self.check("KEYWORD") and self.peek().value.upper() in ("RETURNING", "GIVING", "END-CALL")) and not is_tok_statement_start(self.peek()):
                     if self.match("KEYWORD", "BY"):
                         next_val = self.peek().value.upper()
                         if next_val == "REFERENCE":
@@ -1724,6 +1725,7 @@ class CobolParser:
                 ret_tok = self.consume_val("Expected returning identifier")
                 returning_val = ret_tok.value
             
+            self.match("KEYWORD", "END-CALL")
             self.match("PUNCTUATION", ".")
             
             node = SemanticIRNode(
@@ -3245,7 +3247,7 @@ def parse_sql_tokens(tokens):
         }
         
     else:
-        raise ValueError(f"Unsupported SQL statement type: {first}")
+        return {"sql_type": first}
 
 def extract_host_variables(props):
     vars = []

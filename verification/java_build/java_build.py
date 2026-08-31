@@ -142,7 +142,20 @@ def execute_java(
 
     # Build classpath
     cp_parts = [classes_dir]
-    if classpath_extra:
+    if not classpath_extra and os.path.isfile(os.path.join(project_dir, "pom.xml")):
+        mvn_bin = shutil.which("mvn") or "mvn"
+        cp_file = os.path.join(project_dir, "_mvn_cp.txt")
+        try:
+            subprocess.run([mvn_bin, "dependency:build-classpath", f"-Dmdep.outputFile={cp_file}"],
+                           cwd=project_dir, capture_output=True, timeout=30)
+            if os.path.isfile(cp_file):
+                with open(cp_file, "r", encoding="utf-8") as fh:
+                    dep_cp = fh.read().strip()
+                if dep_cp:
+                    cp_parts.append(dep_cp)
+        except Exception:
+            pass
+    elif classpath_extra:
         cp_parts.extend(classpath_extra)
     cp_sep = ";" if os.name == "nt" else ":"
     cp = cp_sep.join(cp_parts)

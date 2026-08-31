@@ -71,7 +71,7 @@ def test_paymain_end_to_end(tmp_path):
 
     # Inspect stage verdicts
     baseline_v = verdict.baseline_verdict
-    java_v = verdict.java_execute_verdict
+    java_v = verdict.java_build_verdict
     equiv_v = verdict.equivalence_verdict
 
     print(f"\nBaseline:    {baseline_v.value}")

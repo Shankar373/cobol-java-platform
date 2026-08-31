@@ -38,6 +38,8 @@ def translate_statement(stmt: dict, ctx: "GeneratorContext") -> list[str]:
     stype = stmt.get("statement_type", "").upper()
 
     handlers = {
+        "EXEC_SQL":   _exec_sql,
+        "SQL_BLOCK":  _exec_sql,
         "MOVE":       _move,
         "ADD":        _add,
         "SUBTRACT":   _subtract,
@@ -99,7 +101,19 @@ class GeneratorContext:
 
     def field_type(self, cobol_name: str):
         """Return JavaTypeInfo for a field name, or None."""
-        return self.fields.get(cobol_name.upper().replace("-", "_"))
+        name = cobol_name.upper().replace("-", "_")
+        if name in self.fields:
+            return self.fields[name]
+        if name == "SQLCODE":
+            from generators.native_java.types import JavaTypeInfo
+            return JavaTypeInfo(java_type="int", init_expr="0", is_numeric=True, digits=10, signed=True)
+        if name == "SQLSTATE":
+            from generators.native_java.types import JavaTypeInfo
+            return JavaTypeInfo(java_type="String", init_expr='"00000"', is_alpha=True, display_length=5)
+        if name == "RETURN_CODE":
+            from generators.native_java.types import JavaTypeInfo
+            return JavaTypeInfo(java_type="int", init_expr="0", is_numeric=True, digits=4, signed=True)
+        return None
 
     def is_numeric_field(self, cobol_name: str) -> bool:
         ti = self.field_type(cobol_name)
@@ -142,7 +156,7 @@ class GeneratorContext:
             pass
         
         field_name = v_stripped.upper().replace('-', '_')
-        if is_lit or ' ' in raw_val or (field_name not in self.fields and field_name != 'RETURN_CODE'):
+        if is_lit or ' ' in raw_val or (field_name not in self.fields and field_name not in ('RETURN_CODE', 'SQLCODE', 'SQLSTATE')):
             return f'"{raw_val}"'
 
         return to_java_var(v_stripped)
@@ -151,6 +165,11 @@ class GeneratorContext:
 # ---------------------------------------------------------------------------
 # Statement handlers
 # ---------------------------------------------------------------------------
+
+def _exec_sql(stmt: dict, ctx: GeneratorContext) -> list[str]:
+    from generators.native_java.sql import translate_sql_block
+    sql_text = stmt.get("original_sql", stmt.get("content", stmt.get("raw", stmt.get("sql", ""))))
+    return translate_sql_block(sql_text, ctx)
 
 def _move(stmt: dict, ctx: GeneratorContext) -> list[str]:
     src = stmt.get("source", stmt.get("from", ""))
@@ -286,8 +305,14 @@ def _display(stmt: dict, ctx: GeneratorContext) -> list[str]:
         name = op if isinstance(op, str) else (op.get("value") if isinstance(op, dict) else str(op))
         java_val = ctx.literal_or_var(op)
         ti = ctx.field_type(name) if isinstance(name, str) else None
-        if ti and ti.is_numeric and ti.digits > 0 and ti.scale == 0 and not ti.use_cobol_numeric:
-            java_val = f'String.format("%0{ti.digits}d", {java_val})'
+        if ti:
+            if ti.is_numeric and ti.digits > 0 and ti.scale == 0 and not ti.use_cobol_numeric:
+                if ti.signed:
+                    java_val = f'({java_val} >= 0 ? "+" + String.format("%0{ti.digits}d", {java_val}) : String.format("%0{ti.digits+1}d", {java_val}))'
+                else:
+                    java_val = f'String.format("%0{ti.digits}d", {java_val})'
+            elif ti.is_alpha and ti.display_length > 0:
+                java_val = f'String.format("%-{ti.display_length}s", {java_val})'
         parts.append(java_val)
 
     if len(parts) == 1:

@@ -130,8 +130,8 @@ def run_baseline(
             precompile_cmd = (
                 f"mkdir -p _preprocessed && "
                 f"ocesql {src_rel} _preprocessed/{stem}_pp.cob && "
-                f"cobc -x {copybook_flags} -o {exe_name} _preprocessed/{stem}_pp.cob"
-                f" -locesql -lpq"
+                f"cobc -x -I /usr/share/open-cobol-esql/copy {copybook_flags} -o {exe_name} _preprocessed/{stem}_pp.cob"
+                f" -locesql"
             )
             compile_cmd = precompile_cmd
         else:

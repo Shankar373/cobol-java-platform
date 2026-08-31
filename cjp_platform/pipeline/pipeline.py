@@ -260,6 +260,7 @@ class Pipeline:
         )
         if exec_ev.verdict == Verdict.EXECUTED:
             self._java_stdout = exec_ev.stdout
+        exec_ev.stage = "java_build"
         return exec_ev
 
     def _stage_equivalence(self) -> StageEvidence:
