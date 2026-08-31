@@ -115,36 +115,37 @@ class GeneratorContext:
                 is_lit = True
             val = val.get('value', val.get('name', val.get('literal', str(val))))
         
-        v = str(val or '').strip()
-        if not v:
+        raw_val = str(val or '')
+        v_stripped = raw_val.strip()
+        if not v_stripped:
             return '""'
         
-        if v.upper() in ('SPACES', 'SPACE'):
+        if v_stripped.upper() in ('SPACES', 'SPACE'):
             return '""'
-        if v.upper() in ('ZEROS', 'ZEROES', 'ZERO'):
+        if v_stripped.upper() in ('ZEROS', 'ZEROES', 'ZERO'):
             return '0'
-        if v.upper() in ('HIGH-VALUES', 'HIGH-VALUE'):
+        if v_stripped.upper() in ('HIGH-VALUES', 'HIGH-VALUE'):
             return '"\xFF"'
-        if v.upper() in ('LOW-VALUES', 'LOW-VALUE'):
+        if v_stripped.upper() in ('LOW-VALUES', 'LOW-VALUE'):
             return '"\x00"'
-        if v.startswith('"') or v.startswith("'"):
-            return f'"{v[1:-1]}"'
+        if v_stripped.startswith('"') or v_stripped.startswith("'"):
+            return f'"{v_stripped[1:-1]}"'
         try:
-            int(v)
-            return v
+            int(v_stripped)
+            return v_stripped
         except ValueError:
             pass
         try:
-            float(v)
-            return v
+            float(v_stripped)
+            return v_stripped
         except ValueError:
             pass
         
-        field_name = v.upper().replace('-', '_')
-        if is_lit or ' ' in v or (field_name not in self.fields and field_name != 'RETURN_CODE'):
-            return f'"{v}"'
+        field_name = v_stripped.upper().replace('-', '_')
+        if is_lit or ' ' in raw_val or (field_name not in self.fields and field_name != 'RETURN_CODE'):
+            return f'"{raw_val}"'
 
-        return to_java_var(v)
+        return to_java_var(v_stripped)
 
 
 # ---------------------------------------------------------------------------
@@ -282,14 +283,16 @@ def _display(stmt: dict, ctx: GeneratorContext) -> list[str]:
 
     parts = []
     for op in operands:
+        name = op if isinstance(op, str) else (op.get("value") if isinstance(op, dict) else str(op))
         java_val = ctx.literal_or_var(op)
+        ti = ctx.field_type(name) if isinstance(name, str) else None
+        if ti and ti.is_numeric and ti.digits > 0 and ti.scale == 0 and not ti.use_cobol_numeric:
+            java_val = f'String.format("%0{ti.digits}d", {java_val})'
         parts.append(java_val)
 
     if len(parts) == 1:
         return [f"System.out.println({parts[0]});"]
 
-    concat = ' + String.valueOf('.join(parts)
-    # Build: System.out.println(a + String.valueOf(b) + ...)
     expr = parts[0]
     for p in parts[1:]:
         expr += f" + String.valueOf({p})"

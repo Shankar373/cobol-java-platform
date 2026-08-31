@@ -155,6 +155,8 @@ class NativeJavaGenerator:
     def _emit_fields(self) -> list[str]:
         """Emit Java field declarations for WORKING-STORAGE items."""
         lines = []
+        # COBOL Special Registers
+        lines.append("    private int return_code = 0; // COBOL RETURN-CODE register")
         for node in self.ir.nodes_of_kind("DATA_ITEM"):
             p = node.properties
             name = p.get("name", "")
@@ -179,45 +181,44 @@ class NativeJavaGenerator:
         return lines
 
     def _emit_procedure(self) -> list[str]:
-        """Emit statements for the main procedure (non-paragraph statements)."""
+        """Emit statements for the main procedure entry point."""
         lines = []
+        # Find first paragraph or main entry point
+        first_para = None
         for node in self.ir.nodes.values():
-            if node.kind != "STATEMENT":
-                continue
-            p = node.properties
-            if p.get("paragraph"):
-                continue  # paragraph body emitted in _emit_paragraphs
-            stmt_lines = translate_statement(p, self.ctx)
-            for sl in stmt_lines:
-                lines.append(f"        {sl}")
-        if not lines:
-            # Fallback: call all paragraphs in order
-            for para in sorted(self.ctx.paragraphs):
-                lines.append(f"        {to_java_var(para)}();")
+            if node.kind == "PARAGRAPH":
+                first_para = node.properties.get("name")
+                break
+
+        if first_para:
+            lines.append(f"        {to_java_var(first_para)}();")
+        else:
+            # Emitted inline if no paragraphs
+            for node in self.ir.nodes.values():
+                if node.kind == "STATEMENT":
+                    for sl in translate_statement(node.properties, self.ctx):
+                        lines.append(f"        {sl}")
         return lines
 
     def _emit_paragraphs(self) -> list[str]:
         """Emit one Java method per COBOL paragraph."""
         lines = []
-        # Collect paragraphs
         paragraphs: dict[str, list] = {}
+        order: list[str] = []
+
+        current_para = None
         for node in self.ir.nodes.values():
             if node.kind == "PARAGRAPH":
-                para_name = node.properties.get("name", "")
-                if para_name:
-                    paragraphs[para_name] = []
-                    self.ctx.paragraphs.add(para_name)
+                current_para = node.properties.get("name", "")
+                if current_para and current_para not in paragraphs:
+                    paragraphs[current_para] = []
+                    order.append(current_para)
+                    self.ctx.paragraphs.add(current_para)
+            elif node.kind == "STATEMENT" and current_para:
+                paragraphs[current_para].append(node.properties)
 
-        # Collect statements per paragraph
-        for node in self.ir.nodes.values():
-            if node.kind != "STATEMENT":
-                continue
-            para = node.properties.get("paragraph", "")
-            if para and para in paragraphs:
-                paragraphs[para].append(node.properties)
-
-        # Emit
-        for para_name, stmts in paragraphs.items():
+        for para_name in order:
+            stmts = paragraphs[para_name]
             method_name = to_java_var(para_name)
             lines.append(f"    // Paragraph: {para_name}")
             lines.append(f"    private void {method_name}() {{")

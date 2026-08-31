@@ -29,7 +29,7 @@ EXEC_TIMEOUT_SECS = 30
 
 def maven_available() -> bool:
     try:
-        r = subprocess.run(["mvn", "--version"], capture_output=True, timeout=10)
+        r = subprocess.run([shutil.which("mvn") or "mvn", "--version"], capture_output=True, timeout=10)
         return r.returncode == 0
     except (FileNotFoundError, subprocess.TimeoutExpired):
         return False
@@ -69,7 +69,7 @@ def compile_java(project_dir: str, out_dir: Optional[str] = None) -> StageEviden
 
     try:
         result = subprocess.run(
-            ["mvn", "-B", "-q", "compile"],
+            [shutil.which("mvn") or "mvn", "-B", "-q", "compile"],
             cwd=project_dir,
             capture_output=True,
             text=True,
