@@ -5094,12 +5094,15 @@ class Pipeline:
             mod_data_dir = os.path.join(mod_dir, "data")
             shutil.rmtree(mod_data_dir, ignore_errors=True)
             os.makedirs(mod_data_dir, exist_ok=True)
-            # Copy only data/in/
-            src_in = os.path.join(repo_data_dir, "in")
-            dst_in = os.path.join(mod_data_dir, "in")
-            if os.path.isdir(src_in):
-                shutil.copytree(src_in, dst_in)
-            # Create empty work/ and out/ with .gitkeep
+            for item in os.listdir(repo_data_dir):
+                src_item = os.path.join(repo_data_dir, item)
+                dst_item = os.path.join(mod_data_dir, item)
+                if item == "out":
+                    os.makedirs(dst_item, exist_ok=True)
+                elif os.path.isdir(src_item):
+                    shutil.copytree(src_item, dst_item)
+                elif os.path.isfile(src_item):
+                    shutil.copy2(src_item, dst_item)
             for subdir in ("work", "out"):
                 os.makedirs(os.path.join(mod_data_dir, subdir), exist_ok=True)
                 gk = os.path.join(mod_data_dir, subdir, ".gitkeep")
