@@ -1,6 +1,6 @@
 import os
 import json
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional, Any, Tuple
 from skills.validator import parse_skill_file, validate_skill_directory
 
 class SkillRecord:
