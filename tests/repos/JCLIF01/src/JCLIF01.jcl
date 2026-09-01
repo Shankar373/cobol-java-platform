@@ -1,0 +1,17 @@
+//JCLIF01  JOB (ACCT),'IF_THEN_ELSE_TEST'
+//* Step 1: Sets RC=0
+//STEP1    EXEC PGM=COBPROG1
+//* Step 2: Sets RC=4
+//STEP2    EXEC PGM=COBPROG2
+//* IF test: STEP2.RC = 4 -> THEN branch executes COBPROG3
+//IF1      IF (STEP2.RC = 4) THEN
+//STEP3    EXEC PGM=COBPROG3
+//         ELSE
+//STEP4    EXEC PGM=COBPROG4
+//ENDIF1   ENDIF
+//* IF test 2: STEP1.RC > 0 (false) -> ELSE branch executes COBPROG4
+//IF2      IF (STEP1.RC > 0) THEN
+//STEP5    EXEC PGM=COBPROG3
+//         ELSE
+//STEP6    EXEC PGM=COBPROG4
+//ENDIF2   ENDIF

@@ -1,0 +1,6 @@
+{
+  "repo_name": "DB2TXVISIBILITY01",
+  "format": "free",
+  "copybook_dirs": ["src"],
+  "sources": ["src/DB2TVS01.cob"]
+}

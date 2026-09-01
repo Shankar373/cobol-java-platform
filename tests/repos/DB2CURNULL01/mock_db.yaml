@@ -1,0 +1,2 @@
+note: DB2 cursor NULL test - requires DB2 server
+sql: minimal

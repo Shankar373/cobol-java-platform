@@ -1,0 +1,39 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. SIMPLEBASELINE01.
+
+       ENVIRONMENT DIVISION.
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+           SELECT OUT-FILE ASSIGN TO "data/out.dat"
+               ORGANIZATION IS LINE SEQUENTIAL.
+
+       DATA DIVISION.
+       FILE SECTION.
+       FD  OUT-FILE.
+       01  OUT-REC.
+           05  OUT-NAME        PIC X(15).
+           05  OUT-VAL         PIC 9(5).
+
+       WORKING-STORAGE SECTION.
+       01  WS-NUM1             PIC 9(3) VALUE 50.
+       01  WS-NUM2             PIC 9(3) VALUE 25.
+       01  WS-RESULT           PIC 9(5) VALUE 0.
+
+       PROCEDURE DIVISION.
+       MAIN-PROC.
+           DISPLAY "SIMPLEBASELINE01 START".
+
+           ADD WS-NUM1 TO WS-NUM2 GIVING WS-RESULT.
+           DISPLAY "ADD RESULT: " WS-RESULT.
+
+           COMPUTE WS-RESULT = WS-NUM1 * WS-NUM2 + 10.
+           DISPLAY "COMPUTE RESULT: " WS-RESULT.
+
+           OPEN OUTPUT OUT-FILE.
+           MOVE "RECORD ONE" TO OUT-NAME.
+           MOVE WS-RESULT TO OUT-VAL.
+           WRITE OUT-REC.
+           CLOSE OUT-FILE.
+
+           DISPLAY "SIMPLEBASELINE01 END".
+           STOP RUN.

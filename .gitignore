@@ -1,26 +1,51 @@
+# Git ignore for cobj pipeline PoC
+target/
+!target/*.md
+!target/manifest.json
+
+# Exclude generated binaries and Java source
+legacy/bin/
+legacy/generated/
+legacy/data/out/*
+!legacy/data/out/.gitkeep
+legacy/data/work/*
+!legacy/data/work/.gitkeep
+tests/out/
+workspace/
+
+# Python cache
 __pycache__/
 *.pyc
-*.pyo
-*.pyd
-.Python
-build/
-dist/
-*.egg-info/
-.eggs/
-*.egg
+
+# Local config overrides
 .env
-.venv
-venv/
-.pytest_cache/
-.coverage
-*.tmp
-target/
+.idea/
+.vscode/
+
+# Local tool config and runtime logs
+.gemini/
+ui-server.log
+ui-server.err.log
+
+# Compiled binaries and libraries
+*.exe
+*.so
+*.dll
 *.class
-/tmp/
-/scratch/
-/tests/out/
-# Generated artifacts (never commit)
-tests/fixtures/*/generated/
-tests/fixtures/*/target/
-# Logs
-*.log
+*.zip
+*.sha256
+*.dat
+
+# Extra target folders and scratch
+target_*/
+scratch/
+generated/
+
+# Preprocessed shadow tree — regenerated deterministically by preprocess_cobol_for_cobj()
+legacy/_preprocessed/
+
+# Local test artifacts and logs
+artifacts/
+run_*.log
+someout/
+temp_testdisp*

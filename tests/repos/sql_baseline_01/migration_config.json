@@ -1,0 +1,6 @@
+{
+  "repo_name": "sql_baseline_01",
+  "format": "free",
+  "copybook_dirs": ["src"],
+  "sources": ["src/sql_baseline_01.cob"]
+}

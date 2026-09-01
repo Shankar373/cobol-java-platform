@@ -1,0 +1,6 @@
+{
+  "repo_name": "ksds_baseline_01",
+  "format": "fixed",
+  "copybook_dirs": ["src"],
+  "sources": ["src/ksds_baseline_01.cob"]
+}

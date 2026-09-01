@@ -1,0 +1,29 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. CCLEGACYX.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 WS-AREA.
+          05 WS-CODE PIC X(02).
+          05 WS-AMOUNT PIC S9(7)V99 COMP-3.
+          05 WS-FLAGS PIC X(10).
+          05 WS-FLAG-TABLE REDEFINES WS-FLAGS.
+             10 WS-FLAG OCCURS 10 TIMES PIC X.
+       01 WS-INDEX PIC 9(02) COMP VALUE 1.
+       PROCEDURE DIVISION.
+       0000-START.
+           PERFORM 1000-VALIDATE THRU 1000-EXIT
+           GO TO 9000-END.
+       1000-VALIDATE.
+           EVALUATE WS-CODE
+               WHEN "MV" MOVE "MOTOR" TO WS-CODE
+               WHEN "HE" MOVE "HEALTH" TO WS-CODE
+               WHEN OTHER MOVE "XX" TO WS-CODE
+           END-EVALUATE
+           PERFORM VARYING WS-INDEX FROM 1 BY 1
+               UNTIL WS-INDEX > 10
+               MOVE "Y" TO WS-FLAG(WS-INDEX)
+           END-PERFORM.
+       1000-EXIT.
+           EXIT.
+       9000-END.
+           GOBACK.

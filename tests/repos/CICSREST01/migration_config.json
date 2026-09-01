@@ -1,0 +1,7 @@
+{
+  "repo_name": "CICSREST01",
+  "format": "free",
+  "copybook_dirs": ["src"],
+  "sources": ["src/CICSREST01.cob", "src/LINKPROG.cob"],
+  "main_program": "CICSREST01"
+}

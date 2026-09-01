@@ -1,0 +1,39 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. COBPROG1.
+       ENVIRONMENT DIVISION.
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+           SELECT INPUT-FILE ASSIGN TO INPUTDD.
+           SELECT SYSIN-FILE ASSIGN TO SYSIN.
+           SELECT OUTPUT-FILE ASSIGN TO OUTPUTDD.
+       DATA DIVISION.
+       FILE SECTION.
+       FD  INPUT-FILE.
+       01  IN-REC PIC X(80).
+       FD  SYSIN-FILE.
+       01  SYSIN-REC PIC X(80).
+       FD  OUTPUT-FILE.
+       01  OUT-REC PIC X(80).
+       WORKING-STORAGE SECTION.
+       01  WS-EOF-IN PIC X VALUE 'N'.
+       01  WS-EOF-SYS PIC X VALUE 'N'.
+       PROCEDURE DIVISION.
+           OPEN INPUT INPUT-FILE.
+           OPEN INPUT SYSIN-FILE.
+           OPEN OUTPUT OUTPUT-FILE.
+           READ INPUT-FILE
+               AT END MOVE 'Y' TO WS-EOF-IN
+           END-READ.
+           READ SYSIN-FILE
+               AT END MOVE 'Y' TO WS-EOF-SYS
+           END-READ.
+           MOVE SPACES TO OUT-REC.
+           STRING "PROG1:" DELIMITED BY SIZE
+                  IN-REC DELIMITED BY "  "
+                  " " DELIMITED BY SIZE
+                  SYSIN-REC DELIMITED BY "  "
+                  INTO OUT-REC.
+           WRITE OUT-REC.
+           CLOSE INPUT-FILE SYSIN-FILE OUTPUT-FILE.
+           MOVE 0 TO RETURN-CODE.
+           GOBACK.

@@ -1,0 +1,10 @@
+{
+  "repository_name": "SIMPLEBASELINE01",
+  "description": "Simple baseline test repository for non-blocked execution",
+  "source_dir": "src",
+  "copybook_dirs": [],
+  "data_in_dir": "data",
+  "data_out_dir": "data",
+  "main_program": "SIMPLEBASELINE01",
+  "file_assignments": {}
+}

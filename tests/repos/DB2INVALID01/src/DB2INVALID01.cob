@@ -1,0 +1,14 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. DB2INV01.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01  SQLCA-VARIABLES.
+           05  SQLCODE    PIC S9(9) COMP.
+           05  SQLSTATE   PIC X(5).
+       PROCEDURE DIVISION.
+           EXEC SQL
+               SELECT CUST_NAME
+               INTO :WS-UNDECLARED-VARIABLE
+               FROM CUSTOMER
+           END-EXEC.
+           GOBACK.

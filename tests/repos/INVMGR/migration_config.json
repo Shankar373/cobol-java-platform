@@ -1,0 +1,10 @@
+{
+  "repository_name": "INVMGR",
+  "description": "Unseen repository for inventory management domain",
+  "source_dir": "src",
+  "copybook_dirs": [],
+  "data_in_dir": "data",
+  "data_out_dir": "data",
+  "main_program": "INVMGR",
+  "file_assignments": {}
+}

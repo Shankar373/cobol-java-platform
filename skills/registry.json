@@ -1,0 +1,181 @@
+{
+  "version": "1.0.0",
+  "skills": {
+    "behavioral-equivalence": {
+      "name": "behavioral-equivalence",
+      "stage": "VERIFICATION",
+      "description": "Orchestrates differential execution output comparison between legacy COBOL baseline and modern Java execution.",
+      "skill_dir": "skills\\validation\\behavioral-equivalence",
+      "triggers": [
+        "COBOL",
+        "JCL"
+      ],
+      "prerequisites": [
+        "native-java-generation"
+      ],
+      "inputs": [
+        "repository_directory",
+        "pipeline_output_directory"
+      ],
+      "outputs": [
+        "equivalence_report.json"
+      ],
+      "deterministic_components": [
+        "modernize.native_pipeline.NativePipeline.stage_equivalence_gate",
+        "skills.validation.behavioral-equivalence.scripts.verify_equivalence.verify_pipeline_equivalence"
+      ],
+      "references": [
+        "references/differential_contract.md"
+      ],
+      "scripts": [
+        "scripts/verify_equivalence.py"
+      ]
+    },
+    "cobol-program-analysis": {
+      "name": "cobol-program-analysis",
+      "stage": "ANALYSIS",
+      "description": "Performs deterministic AST and semantic analysis of COBOL source programs, identifying symbols, paragraphs, verbs, CALL targets, and diagnostics.",
+      "skill_dir": "skills\\cobol\\program-analysis",
+      "triggers": [
+        "COBOL"
+      ],
+      "prerequisites": [
+        "repository-discovery"
+      ],
+      "inputs": [
+        "cobol_source_file",
+        "copybook_directories"
+      ],
+      "outputs": [
+        "program_analysis_report.json"
+      ],
+      "deterministic_components": [
+        "modernize.lexer.CobolLexer",
+        "modernize.parser.CobolParser",
+        "skills.cobol.program-analysis.scripts.analyze_program.analyze_cobol_program"
+      ],
+      "references": [
+        "references/divisions_and_verbs.md"
+      ],
+      "scripts": [
+        "scripts/analyze_program.py"
+      ]
+    },
+    "copybook-analysis": {
+      "name": "copybook-analysis",
+      "stage": "COPYBOOKS",
+      "description": "Analyzes and resolves COBOL COPY statements, locating library copybooks across search directories with case-sensitivity fallback.",
+      "skill_dir": "skills\\copybooks\\copybook-analysis",
+      "triggers": [
+        "COPYBOOKS",
+        "COBOL"
+      ],
+      "prerequisites": [
+        "repository-discovery"
+      ],
+      "inputs": [
+        "cobol_source_file",
+        "search_directories"
+      ],
+      "outputs": [
+        "copybook_resolution_report.json"
+      ],
+      "deterministic_components": [
+        "modernize.dependencies.DependencyAnalyzer",
+        "skills.copybooks.copybook-analysis.scripts.resolve_copybooks.resolve_copybooks_for_file"
+      ],
+      "references": [
+        "references/copy_semantics.md"
+      ],
+      "scripts": [
+        "scripts/resolve_copybooks.py"
+      ]
+    },
+    "ir-validation": {
+      "name": "ir-validation",
+      "stage": "IR_VALIDATION",
+      "description": "Validates Semantic IR graph completeness, verifying node schema, variable declarations, statement types, and traceability properties.",
+      "skill_dir": "skills\\ir\\ir-validation",
+      "triggers": [
+        "COBOL"
+      ],
+      "prerequisites": [
+        "cobol-program-analysis"
+      ],
+      "inputs": [
+        "semantic_ir"
+      ],
+      "outputs": [
+        "ir_validation_report.json"
+      ],
+      "deterministic_components": [
+        "modernize.semantic_ir.SemanticIR",
+        "skills.ir.ir-validation.scripts.validate_ir.validate_semantic_ir"
+      ],
+      "references": [
+        "references/ir_specification.md"
+      ],
+      "scripts": [
+        "scripts/validate_ir.py"
+      ]
+    },
+    "native-java-generation": {
+      "name": "native-java-generation",
+      "stage": "GENERATION",
+      "description": "Drives deterministic Track B Java and Spring Boot code generation from validated Semantic IR, adhering to zero-proprietary-runtime-dependency standards.",
+      "skill_dir": "skills\\java\\native-java-generation",
+      "triggers": [
+        "COBOL",
+        "JCL"
+      ],
+      "prerequisites": [
+        "ir-validation"
+      ],
+      "inputs": [
+        "repository_directory",
+        "semantic_ir"
+      ],
+      "outputs": [
+        "java_source_files",
+        "pom.xml"
+      ],
+      "deterministic_components": [
+        "modernize.native_generator.NativeProgramGenerator",
+        "modernize.native_pipeline.NativePipeline",
+        "skills.java.native-java-generation.scripts.generate_java.execute_native_java_generation"
+      ],
+      "references": [
+        "references/track_b_standards.md"
+      ],
+      "scripts": [
+        "scripts/generate_java.py"
+      ]
+    },
+    "repository-discovery": {
+      "name": "repository-discovery",
+      "stage": "DISCOVERY",
+      "description": "Inspects arbitrary enterprise repository directories, detects mainframe artifacts (COBOL, JCL, BMS, SQL, copybooks), and produces repository_profile.json.",
+      "skill_dir": "skills\\discovery\\repository-discovery",
+      "triggers": [
+        "ALWAYS"
+      ],
+      "prerequisites": [],
+      "inputs": [
+        "repository_directory"
+      ],
+      "outputs": [
+        "repository_profile.json"
+      ],
+      "deterministic_components": [
+        "modernize.dependencies.DependencyAnalyzer",
+        "skills.discovery.repository-discovery.scripts.discover.discover_repository"
+      ],
+      "references": [
+        "references/detection_rules.md"
+      ],
+      "scripts": [
+        "scripts/discover.py"
+      ]
+    }
+  }
+}

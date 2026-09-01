@@ -1,0 +1,6 @@
+{
+  "repo_name": "DB2INVALID01",
+  "format": "free",
+  "copybook_dirs": ["src"],
+  "sources": ["src/DB2INVALID01.cob"]
+}

@@ -1,0 +1,1223 @@
+{
+  "PIC.DISPLAY_NUMERIC": {
+    "evidence_level": "DIFFERENTIALLY_VERIFIED",
+    "parser_function": "CobolParser._parse_data_item",
+    "generator_function": "NativeProgramGenerator._emit_field_decl",
+    "runtime_helper": "CobolNumeric / CobolNumericSpec",
+    "existing_tests": [
+      "tests/test_parity_fixtures.py::test_milestone_b_parity[milestone_b_pic9_integer_arithmetic_baseline]",
+      "tests/test_native_type_mapping.py"
+    ],
+    "known_limitations": [
+      "USAGE IS INDEX not supported"
+    ],
+    "unsupported_patterns": [],
+    "recommended_next_test": "Verify PIC 9(18) boundary near long overflow",
+    "notes": "",
+    "status": "DIFFERENTIALLY_VERIFIED"
+  },
+  "PIC.DISPLAY_ALPHA": {
+    "evidence_level": "DIFFERENTIALLY_VERIFIED",
+    "parser_function": "CobolParser._parse_data_item",
+    "generator_function": "NativeProgramGenerator._emit_field_decl",
+    "runtime_helper": "String / CobolFormatHelper",
+    "existing_tests": [
+      "tests/test_parity_fixtures.py::test_milestone_a_basic_move"
+    ],
+    "known_limitations": [
+      "PIC A not separately tested from PIC X"
+    ],
+    "unsupported_patterns": [],
+    "recommended_next_test": "Add PIC A differential fixture",
+    "notes": "",
+    "status": "DIFFERENTIALLY_VERIFIED"
+  },
+  "PIC.EDITED_NUMERIC": {
+    "evidence_level": "UNIT_TESTED",
+    "parser_function": "CobolParser._parse_data_item",
+    "generator_function": "NativeProgramGenerator._emit_field_decl",
+    "runtime_helper": "CobolFormatHelper",
+    "existing_tests": [
+      "tests/test_phase8_pic_formatting.py"
+    ],
+    "known_limitations": [
+      "CR/DB suffix editing not fully tested"
+    ],
+    "unsupported_patterns": [
+      "PIC +(5)9 float-style editing"
+    ],
+    "recommended_next_test": "Differential fixture for PIC ZZ,ZZZ.99CR",
+    "notes": "",
+    "status": "UNIT_TESTED"
+  },
+  "PIC.EDITED_ALPHA": {
+    "evidence_level": "UNIT_TESTED",
+    "parser_function": "CobolParser._parse_data_item",
+    "generator_function": "NativeProgramGenerator._emit_field_decl",
+    "runtime_helper": "CobolFormatHelper",
+    "existing_tests": [
+      "tests/test_phase8_pic_formatting.py"
+    ],
+    "known_limitations": [],
+    "unsupported_patterns": [],
+    "recommended_next_test": "Differential fixture for PIC X(5)/X(5)",
+    "notes": "",
+    "status": "UNIT_TESTED"
+  },
+  "USAGE.DISPLAY": {
+    "evidence_level": "DIFFERENTIALLY_VERIFIED",
+    "parser_function": "CobolParser._parse_data_item",
+    "generator_function": "NativeProgramGenerator._emit_field_decl",
+    "runtime_helper": "CobolNumeric (DISPLAY path)",
+    "existing_tests": [
+      "tests/test_parity_fixtures.py::test_milestone_b_parity[*]"
+    ],
+    "known_limitations": [],
+    "unsupported_patterns": [],
+    "recommended_next_test": null,
+    "notes": "",
+    "status": "DIFFERENTIALLY_VERIFIED"
+  },
+  "USAGE.COMP": {
+    "evidence_level": "UNIT_TESTED",
+    "parser_function": "CobolParser._parse_data_item",
+    "generator_function": "NativeProgramGenerator._emit_field_decl",
+    "runtime_helper": "CobolNumeric (COMP path via CobolUsage.COMP)",
+    "existing_tests": [
+      "tests/test_native_type_mapping.py"
+    ],
+    "known_limitations": [
+      "COMP-1 (float) and COMP-2 (double) not supported"
+    ],
+    "unsupported_patterns": [
+      "USAGE COMP-1",
+      "USAGE COMP-2"
+    ],
+    "recommended_next_test": "Differential COMP arithmetic fixture",
+    "notes": "",
+    "status": "UNIT_TESTED"
+  },
+  "USAGE.COMP_3": {
+    "evidence_level": "DIFFERENTIALLY_VERIFIED",
+    "parser_function": "CobolParser._parse_data_item",
+    "generator_function": "NativeProgramGenerator._emit_field_decl",
+    "runtime_helper": "CobolNumeric (COMP-3 BCD encode/decode)",
+    "existing_tests": [
+      "tests/test_parity_fixtures.py::test_milestone_b_parity[milestone_b_comp3_roundtrip]",
+      "tests/test_phase8_arithmetic_errors.py"
+    ],
+    "known_limitations": [
+      "Negative zero not separately tested"
+    ],
+    "unsupported_patterns": [],
+    "recommended_next_test": "Differential file write+read with COMP-3 field",
+    "notes": "",
+    "status": "DIFFERENTIALLY_VERIFIED"
+  },
+  "USAGE.COMP_5": {
+    "evidence_level": "GENERATED_ONLY",
+    "parser_function": "CobolParser._parse_data_item",
+    "generator_function": "NativeProgramGenerator._emit_field_decl",
+    "runtime_helper": "CobolNumeric (mapped to CobolUsage.COMP)",
+    "existing_tests": [],
+    "known_limitations": [
+      "COMP-5 native-endian binary not verified differentially"
+    ],
+    "unsupported_patterns": [],
+    "recommended_next_test": "Differential COMP-5 boundary value fixture",
+    "notes": "",
+    "status": "GENERATED_ONLY"
+  },
+  "USAGE.INDEX": {
+    "evidence_level": "UNSUPPORTED",
+    "parser_function": null,
+    "generator_function": null,
+    "runtime_helper": null,
+    "existing_tests": [],
+    "known_limitations": [
+      "USAGE IS INDEX not parsed as a distinct numeric type"
+    ],
+    "unsupported_patterns": [
+      "USAGE IS INDEX"
+    ],
+    "recommended_next_test": "Add INDEX support diagnostic",
+    "notes": "",
+    "status": "UNSUPPORTED"
+  },
+  "ARITH.ADD": {
+    "evidence_level": "DIFFERENTIALLY_VERIFIED",
+    "parser_function": "CobolParser._parse_arithmetic_stmt",
+    "generator_function": "NativeProgramGenerator._emit_add",
+    "runtime_helper": "CobolArithmetic.add / CobolNumeric.assign",
+    "existing_tests": [
+      "tests/test_parity_fixtures.py::test_milestone_b_parity[milestone_b_pic9_integer_arithmetic_baseline]"
+    ],
+    "known_limitations": [
+      "ADD CORRESPONDING not supported"
+    ],
+    "unsupported_patterns": [
+      "ADD CORRESPONDING"
+    ],
+    "recommended_next_test": "ADD multi-receiver differential",
+    "notes": "",
+    "status": "DIFFERENTIALLY_VERIFIED"
+  },
+  "ARITH.SUBTRACT": {
+    "evidence_level": "DIFFERENTIALLY_VERIFIED",
+    "parser_function": "CobolParser._parse_arithmetic_stmt",
+    "generator_function": "NativeProgramGenerator._emit_subtract",
+    "runtime_helper": "CobolArithmetic.subtract / CobolNumeric.assign",
+    "existing_tests": [
+      "tests/test_parity_fixtures.py::test_milestone_b_parity[milestone_b_negative_subtract]"
+    ],
+    "known_limitations": [
+      "SUBTRACT CORRESPONDING not supported"
+    ],
+    "unsupported_patterns": [
+      "SUBTRACT CORRESPONDING"
+    ],
+    "recommended_next_test": null,
+    "notes": "",
+    "status": "DIFFERENTIALLY_VERIFIED"
+  },
+  "ARITH.MULTIPLY": {
+    "evidence_level": "DIFFERENTIALLY_VERIFIED",
+    "parser_function": "CobolParser._parse_arithmetic_stmt",
+    "generator_function": "NativeProgramGenerator._emit_multiply",
+    "runtime_helper": "CobolArithmetic.multiply / CobolNumeric.assign",
+    "existing_tests": [
+      "tests/test_parity_fixtures.py::test_milestone_b_parity[milestone_b_pics9_signed_arithmetic]"
+    ],
+    "known_limitations": [
+      "MULTIPLY CORRESPONDING not supported"
+    ],
+    "unsupported_patterns": [
+      "MULTIPLY CORRESPONDING"
+    ],
+    "recommended_next_test": null,
+    "notes": "",
+    "status": "DIFFERENTIALLY_VERIFIED"
+  },
+  "ARITH.DIVIDE": {
+    "evidence_level": "DIFFERENTIALLY_VERIFIED",
+    "parser_function": "CobolParser._parse_arithmetic_stmt",
+    "generator_function": "NativeProgramGenerator._emit_divide",
+    "runtime_helper": "CobolArithmetic.divide (MathContext.DECIMAL128)",
+    "existing_tests": [
+      "tests/test_parity_fixtures.py::test_milestone_b_parity[milestone_b_division_scale_normalization]",
+      "tests/test_parity_fixtures.py::test_milestone_b_parity[milestone_b_divide_remainder]"
+    ],
+    "known_limitations": [
+      "Recurring decimal truncated to target PIC scale"
+    ],
+    "unsupported_patterns": [],
+    "recommended_next_test": "Differential 1/3 with PIC V99 vs V9(9)",
+    "notes": "",
+    "status": "DIFFERENTIALLY_VERIFIED"
+  },
+  "ARITH.COMPUTE": {
+    "evidence_level": "DIFFERENTIALLY_VERIFIED",
+    "parser_function": "CobolParser._parse_compute_stmt",
+    "generator_function": "NativeProgramGenerator._emit_compute",
+    "runtime_helper": "CobolArithmetic (all ops)",
+    "existing_tests": [
+      "tests/test_parity_fixtures.py::test_milestone_b_parity[milestone_b_compute_mixed]",
+      "tests/test_parity_fixtures.py::test_parity_exponentiation_differential",
+      "tests/component/arithmetic/test_power_differential.py"
+    ],
+    "known_limitations": [
+      "Fractional exponents are unsupported and fail-fast with a clear diagnostic (no double math)"
+    ],
+    "unsupported_patterns": [
+      "Non-integer COMPUTE ** exponent"
+    ],
+    "recommended_next_test": "Verify runtime exception on non-integer exponent",
+    "notes": "",
+    "status": "DIFFERENTIALLY_VERIFIED"
+  },
+  "ARITH.ROUNDED": {
+    "evidence_level": "DIFFERENTIALLY_VERIFIED",
+    "parser_function": "CobolParser._parse_arithmetic_stmt",
+    "generator_function": "NativeProgramGenerator._emit_rounded_assign",
+    "runtime_helper": "CobolRoundingMode.NEAREST_AWAY_FROM_ZERO",
+    "existing_tests": [
+      "tests/test_parity_fixtures.py::test_milestone_b_parity[milestone_b_rounded_arithmetic]"
+    ],
+    "known_limitations": [
+      "Only NEAREST_AWAY_FROM_ZERO (HALF_UP) is emitted for plain ROUNDED"
+    ],
+    "unsupported_patterns": [
+      "ROUNDED MODE IS NEAREST-EVEN",
+      "ROUNDED MODE IS TOWARD-GREATER"
+    ],
+    "recommended_next_test": "Differential negative halfway rounding",
+    "notes": "",
+    "status": "DIFFERENTIALLY_VERIFIED"
+  },
+  "ARITH.ON_SIZE_ERROR": {
+    "evidence_level": "DIFFERENTIALLY_VERIFIED",
+    "parser_function": "CobolParser._parse_arithmetic_stmt",
+    "generator_function": "NativeProgramGenerator._emit_size_error_guard",
+    "runtime_helper": "SizeErrorPolicy.CHECKED / CobolNumeric.assign",
+    "existing_tests": [
+      "tests/test_parity_fixtures.py::test_milestone_b_parity[milestone_b_positive_target_field_overflow]"
+    ],
+    "known_limitations": [
+      "NOT ON SIZE ERROR clause generated but coverage limited"
+    ],
+    "unsupported_patterns": [],
+    "recommended_next_test": "Differential NOT ON SIZE ERROR path",
+    "notes": "",
+    "status": "DIFFERENTIALLY_VERIFIED"
+  },
+  "MOVE.ALPHA_TO_ALPHA": {
+    "evidence_level": "DIFFERENTIALLY_VERIFIED",
+    "parser_function": "CobolParser._parse_move_stmt",
+    "generator_function": "NativeProgramGenerator._emit_move",
+    "runtime_helper": null,
+    "existing_tests": [
+      "tests/test_parity_fixtures.py::test_milestone_a_basic_move"
+    ],
+    "known_limitations": [
+      "Truncation on right, no padding verified differentially for PIC X(N) \u2192 PIC X(M) with N>M"
+    ],
+    "unsupported_patterns": [],
+    "recommended_next_test": null,
+    "notes": "",
+    "status": "DIFFERENTIALLY_VERIFIED"
+  },
+  "MOVE.NUMERIC_TO_NUMERIC": {
+    "evidence_level": "DIFFERENTIALLY_VERIFIED",
+    "parser_function": "CobolParser._parse_move_stmt",
+    "generator_function": "NativeProgramGenerator._emit_move",
+    "runtime_helper": "CobolNumeric.assign",
+    "existing_tests": [
+      "tests/test_parity_fixtures.py::test_milestone_b_parity[milestone_b_pic9v99_implied_decimal_assignment]"
+    ],
+    "known_limitations": [
+      "MOVE CORRESPONDING not supported"
+    ],
+    "unsupported_patterns": [
+      "MOVE CORRESPONDING"
+    ],
+    "recommended_next_test": null,
+    "notes": "",
+    "status": "DIFFERENTIALLY_VERIFIED"
+  },
+  "MOVE.GROUP_TO_GROUP": {
+    "evidence_level": "UNIT_TESTED",
+    "parser_function": "CobolParser._parse_move_stmt",
+    "generator_function": "NativeProgramGenerator._emit_move",
+    "runtime_helper": null,
+    "existing_tests": [
+      "tests/test_phase8_layout_integration.py"
+    ],
+    "known_limitations": [
+      "Group MOVE treated as byte copy; byte-exact differential not verified"
+    ],
+    "unsupported_patterns": [],
+    "recommended_next_test": "Differential group MOVE byte-comparison fixture",
+    "notes": "",
+    "status": "UNIT_TESTED"
+  },
+  "REDEFINES.SCALAR": {
+    "evidence_level": "DIFFERENTIALLY_VERIFIED",
+    "parser_function": "CobolParser._parse_data_item",
+    "generator_function": "NativeProgramGenerator._emit_redefines",
+    "runtime_helper": null,
+    "existing_tests": [
+      "tests/test_phase8_redefines.py",
+      "tests/test_parity_fixtures.py::test_milestone_b_parity[milestone_b_redefines_scalar_view]"
+    ],
+    "known_limitations": [],
+    "unsupported_patterns": [],
+    "recommended_next_test": "Verify nested redefines on COMP-3 structures",
+    "notes": "",
+    "status": "DIFFERENTIALLY_VERIFIED"
+  },
+  "REDEFINES.GROUP": {
+    "evidence_level": "DIFFERENTIALLY_VERIFIED",
+    "parser_function": "CobolParser._parse_data_item",
+    "generator_function": "NativeProgramGenerator._emit_redefines",
+    "runtime_helper": null,
+    "existing_tests": [
+      "tests/test_phase8_redefines.py",
+      "tests/test_parity_fixtures.py::test_parity_redefines_group_view"
+    ],
+    "known_limitations": [],
+    "unsupported_patterns": [],
+    "recommended_next_test": "Verify complex deep group overlays with shifting offsets",
+    "notes": "",
+    "status": "DIFFERENTIALLY_VERIFIED"
+  },
+  "REDEFINES.COMP3_VIEW": {
+    "evidence_level": "DIFFERENTIALLY_VERIFIED",
+    "parser_function": "CobolParser._parse_data_item",
+    "generator_function": "NativeProgramGenerator._emit_redefines",
+    "runtime_helper": "CobolNumeric (COMP-3 encode)",
+    "existing_tests": [
+      "tests/test_phase8_redefines.py",
+      "tests/test_parity_fixtures.py::test_milestone_b_parity[milestone_b_redefines_comp3_byte_view]"
+    ],
+    "known_limitations": [],
+    "unsupported_patterns": [],
+    "recommended_next_test": "Differential COMP-3 negative sign byte view",
+    "notes": "",
+    "status": "DIFFERENTIALLY_VERIFIED"
+  },
+  "REDEFINES.NESTED_COMPLEX": {
+    "evidence_level": "PARSED_ONLY",
+    "parser_function": null,
+    "generator_function": null,
+    "runtime_helper": null,
+    "existing_tests": [],
+    "known_limitations": [
+      "Nested REDEFINES with OCCURS not fully generated"
+    ],
+    "unsupported_patterns": [
+      "REDEFINES of OCCURS-containing group",
+      "3+ level nested REDEFINES"
+    ],
+    "recommended_next_test": "Add diagnostic for unsupported nested REDEFINES",
+    "notes": "",
+    "status": "PARSED_ONLY"
+  },
+  "OCCURS.FIXED": {
+    "evidence_level": "UNIT_TESTED",
+    "parser_function": "CobolParser._parse_data_item",
+    "generator_function": "NativeProgramGenerator._emit_occurs",
+    "runtime_helper": null,
+    "existing_tests": [
+      "tests/test_native_occurs.py"
+    ],
+    "known_limitations": [
+      "OCCURS inside REDEFINES not differentially verified"
+    ],
+    "unsupported_patterns": [],
+    "recommended_next_test": "Differential OCCURS table read/write fixture",
+    "notes": "",
+    "status": "UNIT_TESTED"
+  },
+  "OCCURS.DEPENDING_ON": {
+    "evidence_level": "GENERATED_ONLY",
+    "parser_function": "CobolParser._parse_data_item",
+    "generator_function": "NativeProgramGenerator._emit_occurs_depending",
+    "runtime_helper": null,
+    "existing_tests": [],
+    "known_limitations": [
+      "OCCURS DEPENDING ON generated but runtime bounds not differentially verified"
+    ],
+    "unsupported_patterns": [],
+    "recommended_next_test": "Differential ODO fixture with varying bound",
+    "notes": "",
+    "status": "GENERATED_ONLY"
+  },
+  "PROC.PERFORM": {
+    "evidence_level": "UNIT_TESTED",
+    "parser_function": "CobolParser._parse_perform_stmt",
+    "generator_function": "NativeProgramGenerator._emit_perform",
+    "runtime_helper": null,
+    "existing_tests": [
+      "tests/test_native_perform_varying.py",
+      "tests/test_phase8_control_flow.py"
+    ],
+    "known_limitations": [],
+    "unsupported_patterns": [],
+    "recommended_next_test": "Differential PERFORM VARYING fixture",
+    "notes": "",
+    "status": "UNIT_TESTED"
+  },
+  "PROC.PERFORM_THRU": {
+    "evidence_level": "UNIT_TESTED",
+    "parser_function": "CobolParser._parse_perform_stmt",
+    "generator_function": "NativeProgramGenerator._emit_perform_thru",
+    "runtime_helper": null,
+    "existing_tests": [
+      "tests/test_native_paragraph_control.py"
+    ],
+    "known_limitations": [
+      "EXIT PARAGRAPH inside THRU range not differentially verified"
+    ],
+    "unsupported_patterns": [],
+    "recommended_next_test": "Differential PERFORM THRU fixture with paragraph range",
+    "notes": "",
+    "status": "UNIT_TESTED"
+  },
+  "PROC.PERFORM_VARYING": {
+    "evidence_level": "DIFFERENTIALLY_VERIFIED",
+    "parser_function": "CobolParser._parse_perform_stmt",
+    "generator_function": "NativeProgramGenerator._emit_perform",
+    "runtime_helper": null,
+    "existing_tests": [
+      "tests/test_native_perform_varying.py",
+      "tests/test_parity_fixtures.py::test_parity_perform_varying"
+    ],
+    "known_limitations": [
+      "Multi-varying loops (AFTER clause) not fully supported"
+    ],
+    "unsupported_patterns": [],
+    "recommended_next_test": "Differential PERFORM VARYING with AFTER clause",
+    "notes": "",
+    "status": "DIFFERENTIALLY_VERIFIED"
+  },
+  "PROC.GO_TO": {
+    "evidence_level": "UNIT_TESTED",
+    "parser_function": "CobolParser._parse_goto_stmt",
+    "generator_function": "NativeProgramGenerator._emit_goto",
+    "runtime_helper": null,
+    "existing_tests": [
+      "tests/test_phase8_control_flow.py"
+    ],
+    "known_limitations": [
+      "GO TO inside PERFORM THRU range not differentially verified"
+    ],
+    "unsupported_patterns": [
+      "GO TO DEPENDING ON"
+    ],
+    "recommended_next_test": "Differential GO TO within performed paragraph range",
+    "notes": "",
+    "status": "UNIT_TESTED"
+  },
+  "PROC.CALL_STATIC": {
+    "evidence_level": "UNIT_TESTED",
+    "parser_function": "CobolParser._parse_call_stmt",
+    "generator_function": "NativeProgramGenerator._emit_call",
+    "runtime_helper": null,
+    "existing_tests": [
+      "tests/test_native_call_translation.py"
+    ],
+    "known_limitations": [
+      "BY VALUE not differentially verified",
+      "BY CONTENT isolation not differentially verified"
+    ],
+    "unsupported_patterns": [],
+    "recommended_next_test": "Differential CALL BY REFERENCE mutation fixture",
+    "notes": "",
+    "status": "UNIT_TESTED"
+  },
+  "PROC.CALL_DYNAMIC": {
+    "evidence_level": "GENERATED_ONLY",
+    "parser_function": "CobolParser._parse_call_stmt",
+    "generator_function": "NativeProgramGenerator._emit_call",
+    "runtime_helper": null,
+    "existing_tests": [
+      "tests/test_dependencies.py"
+    ],
+    "known_limitations": [
+      "Dynamic CALL target resolved via program registry; unknown targets produce diagnostic"
+    ],
+    "unsupported_patterns": [
+      "CALL USING identifier resolved at runtime with no registry entry"
+    ],
+    "recommended_next_test": "Differential dynamic CALL fixture",
+    "notes": "",
+    "status": "GENERATED_ONLY"
+  },
+  "PROC.CALL_BY_REFERENCE": {
+    "evidence_level": "UNIT_TESTED",
+    "parser_function": "CobolParser._parse_call_stmt",
+    "generator_function": "NativeProgramGenerator._emit_call",
+    "runtime_helper": null,
+    "existing_tests": [
+      "tests/test_native_call_translation.py"
+    ],
+    "known_limitations": [
+      "Caller-visible mutation not differentially verified"
+    ],
+    "unsupported_patterns": [],
+    "recommended_next_test": "Differential BY REFERENCE mutation test",
+    "notes": "",
+    "status": "UNIT_TESTED"
+  },
+  "PROC.CALL_BY_CONTENT": {
+    "evidence_level": "DIFFERENTIALLY_VERIFIED",
+    "parser_function": "CobolParser._parse_call_stmt",
+    "generator_function": "NativeProgramGenerator._emit_call",
+    "runtime_helper": null,
+    "existing_tests": [
+      "tests/test_native_call_translation.py",
+      "tests/test_parity_fixtures.py::test_parity_call_by_content"
+    ],
+    "known_limitations": [],
+    "unsupported_patterns": [],
+    "recommended_next_test": "Verify complex structures passed by CONTENT",
+    "notes": "",
+    "status": "DIFFERENTIALLY_VERIFIED"
+  },
+  "PROC.GOBACK": {
+    "evidence_level": "UNIT_TESTED",
+    "parser_function": "CobolParser._parse_goback_stmt",
+    "generator_function": "NativeProgramGenerator._emit_goback",
+    "runtime_helper": null,
+    "existing_tests": [
+      "tests/test_phase8_control_flow.py"
+    ],
+    "known_limitations": [],
+    "unsupported_patterns": [],
+    "recommended_next_test": null,
+    "notes": "",
+    "status": "UNIT_TESTED"
+  },
+  "PROC.STOP_RUN": {
+    "evidence_level": "UNIT_TESTED",
+    "parser_function": "CobolParser._parse_stop_stmt",
+    "generator_function": "NativeProgramGenerator._emit_stop_run",
+    "runtime_helper": null,
+    "existing_tests": [
+      "tests/test_phase8_control_flow.py"
+    ],
+    "known_limitations": [],
+    "unsupported_patterns": [],
+    "recommended_next_test": null,
+    "notes": "",
+    "status": "UNIT_TESTED"
+  },
+  "PROC.EVALUATE": {
+    "evidence_level": "UNIT_TESTED",
+    "parser_function": "CobolParser._parse_evaluate_stmt",
+    "generator_function": "NativeProgramGenerator._emit_evaluate",
+    "runtime_helper": null,
+    "existing_tests": [
+      "tests/test_native_evaluate.py"
+    ],
+    "known_limitations": [
+      "EVALUATE TRUE ALSO TRUE (multi-subject) not differentially verified"
+    ],
+    "unsupported_patterns": [],
+    "recommended_next_test": "Differential EVALUATE with WHEN OTHER",
+    "notes": "",
+    "status": "UNIT_TESTED"
+  },
+  "PROC.IF": {
+    "evidence_level": "UNIT_TESTED",
+    "parser_function": "CobolParser._parse_if_stmt",
+    "generator_function": "NativeProgramGenerator._emit_if",
+    "runtime_helper": null,
+    "existing_tests": [
+      "tests/test_phase8_control_flow.py"
+    ],
+    "known_limitations": [],
+    "unsupported_patterns": [],
+    "recommended_next_test": null,
+    "notes": "",
+    "status": "UNIT_TESTED"
+  },
+  "PROC.SECTIONS": {
+    "evidence_level": "GENERATED_ONLY",
+    "parser_function": "CobolParser._parse_section",
+    "generator_function": "NativeProgramGenerator._emit_section",
+    "runtime_helper": null,
+    "existing_tests": [],
+    "known_limitations": [
+      "Sections with PERFORM THRU not differentially verified"
+    ],
+    "unsupported_patterns": [],
+    "recommended_next_test": "Differential SECTION fall-through fixture",
+    "notes": "",
+    "status": "GENERATED_ONLY"
+  },
+  "STRING.STRING_STMT": {
+    "evidence_level": "UNIT_TESTED",
+    "parser_function": "CobolParser._parse_string_stmt",
+    "generator_function": "NativeProgramGenerator._emit_string",
+    "runtime_helper": null,
+    "existing_tests": [
+      "tests/test_phase8_string_operations.py"
+    ],
+    "known_limitations": [],
+    "unsupported_patterns": [],
+    "recommended_next_test": "Differential STRING INTO with POINTER",
+    "notes": "",
+    "status": "UNIT_TESTED"
+  },
+  "STRING.UNSTRING_STMT": {
+    "evidence_level": "UNIT_TESTED",
+    "parser_function": "CobolParser._parse_unstring_stmt",
+    "generator_function": "NativeProgramGenerator._emit_unstring",
+    "runtime_helper": null,
+    "existing_tests": [
+      "tests/test_phase8_string_operations.py"
+    ],
+    "known_limitations": [],
+    "unsupported_patterns": [],
+    "recommended_next_test": null,
+    "notes": "",
+    "status": "UNIT_TESTED"
+  },
+  "STRING.INSPECT": {
+    "evidence_level": "UNIT_TESTED",
+    "parser_function": "CobolParser._parse_inspect_stmt",
+    "generator_function": "NativeProgramGenerator._emit_inspect",
+    "runtime_helper": null,
+    "existing_tests": [
+      "tests/test_phase8_string_operations.py"
+    ],
+    "known_limitations": [],
+    "unsupported_patterns": [],
+    "recommended_next_test": null,
+    "notes": "",
+    "status": "UNIT_TESTED"
+  },
+  "FILE.LINE_SEQUENTIAL": {
+    "evidence_level": "DIFFERENTIALLY_VERIFIED",
+    "parser_function": "CobolParser._parse_file_control",
+    "generator_function": "NativeProgramGenerator._emit_file_io",
+    "runtime_helper": null,
+    "existing_tests": [
+      "tests/test_parity_fixtures.py::test_milestone_a_line_sequential_file"
+    ],
+    "known_limitations": [
+      "EBCDIC encoding not tested",
+      "Variable-length records not supported"
+    ],
+    "unsupported_patterns": [],
+    "recommended_next_test": "Differential trailing-space preservation fixture",
+    "notes": "",
+    "status": "DIFFERENTIALLY_VERIFIED"
+  },
+  "FILE.SEQUENTIAL_FIXED": {
+    "evidence_level": "UNIT_TESTED",
+    "parser_function": "CobolParser._parse_file_control",
+    "generator_function": "NativeProgramGenerator._emit_file_io",
+    "runtime_helper": null,
+    "existing_tests": [
+      "tests/test_parity_fixtures.py::test_milestone_b_fixed_binary_file_io",
+      "tests/test_phase8_file_semantics.py"
+    ],
+    "known_limitations": [
+      "Record boundary not enforced by read length; uses newline-delimited internally"
+    ],
+    "unsupported_patterns": [],
+    "recommended_next_test": "Differential fixed-length record boundary verification",
+    "notes": "",
+    "status": "UNIT_TESTED"
+  },
+  "FILE.SEQUENTIAL_EBCDIC": {
+    "evidence_level": "UNSUPPORTED",
+    "parser_function": null,
+    "generator_function": null,
+    "runtime_helper": null,
+    "existing_tests": [],
+    "known_limitations": [
+      "No EBCDIC charset codec in file I/O path"
+    ],
+    "unsupported_patterns": [
+      "CODEPAGE EBCDIC",
+      "IBM-1047 encoding"
+    ],
+    "recommended_next_test": "Add EBCDIC file codec and differential fixture",
+    "notes": "",
+    "status": "UNSUPPORTED"
+  },
+  "FILE.RELATIVE": {
+    "evidence_level": "UNIT_TESTED",
+    "parser_function": "CobolParser._parse_file_control",
+    "generator_function": "NativeProgramGenerator._emit_file_io",
+    "runtime_helper": null,
+    "existing_tests": [
+      "tests/test_vsam_rrds.py"
+    ],
+    "known_limitations": [
+      "Numeric RRN stored as string key internally"
+    ],
+    "unsupported_patterns": [],
+    "recommended_next_test": "Differential relative-file random access fixture",
+    "notes": "",
+    "status": "UNIT_TESTED"
+  },
+  "FILE.INDEXED_KSDS": {
+    "evidence_level": "UNIT_TESTED",
+    "parser_function": "CobolParser._parse_file_control",
+    "generator_function": "NativeProgramGenerator._emit_file_io",
+    "runtime_helper": "VsamIndexedStore",
+    "existing_tests": [
+      "tests/test_vsam_ksds_stage2.py"
+    ],
+    "known_limitations": [
+      "Alternate indexes partial only",
+      "Duplicate key behavior differentially verified via test_vsam_ksds_stage2"
+    ],
+    "unsupported_patterns": [],
+    "recommended_next_test": "Differential indexed file START + READ NEXT fixture",
+    "notes": "",
+    "status": "UNIT_TESTED"
+  },
+  "FILE.FILE_STATUS": {
+    "evidence_level": "UNIT_TESTED",
+    "parser_function": "CobolParser._parse_file_control",
+    "generator_function": "NativeProgramGenerator._emit_file_io",
+    "runtime_helper": null,
+    "existing_tests": [
+      "tests/test_native_file_io.py",
+      "tests/test_phase8_file_semantics.py"
+    ],
+    "known_limitations": [
+      "FILE STATUS not captured in parity harness ExecutionResult"
+    ],
+    "unsupported_patterns": [],
+    "recommended_next_test": "Add FILE STATUS capture to parity harness; differential fixture",
+    "notes": "",
+    "status": "UNIT_TESTED"
+  },
+  "FILE.VARIABLE_LENGTH": {
+    "evidence_level": "UNSUPPORTED",
+    "parser_function": null,
+    "generator_function": null,
+    "runtime_helper": null,
+    "existing_tests": [],
+    "known_limitations": [
+      "RDW/variable-block not supported"
+    ],
+    "unsupported_patterns": [
+      "RECORDING MODE V",
+      "RECORDING MODE U"
+    ],
+    "recommended_next_test": "Add diagnostic COBOL_UNSUPPORTED_RECORD_FORMAT",
+    "notes": "",
+    "status": "UNSUPPORTED"
+  },
+  "SQL.SELECT_INTO": {
+    "evidence_level": "UNIT_TESTED",
+    "parser_function": "CobolParser._parse_exec_sql",
+    "generator_function": "NativeProgramGenerator._emit_exec_sql",
+    "runtime_helper": null,
+    "existing_tests": [
+      "tests/test_db2_acceptance.py",
+      "tests/test_db2_stage1.py"
+    ],
+    "known_limitations": [
+      "Not differentially verified via GnuCOBOL (blocked at baseline)"
+    ],
+    "unsupported_patterns": [],
+    "recommended_next_test": "Differential SQL fixture using H2 vs GnuCOBOL baseline bypass",
+    "notes": "",
+    "status": "UNIT_TESTED"
+  },
+  "SQL.INSERT": {
+    "evidence_level": "UNIT_TESTED",
+    "parser_function": "CobolParser._parse_exec_sql",
+    "generator_function": "NativeProgramGenerator._emit_exec_sql",
+    "runtime_helper": null,
+    "existing_tests": [
+      "tests/test_db2_acceptance.py"
+    ],
+    "known_limitations": [
+      "Not differentially verified vs GnuCOBOL"
+    ],
+    "unsupported_patterns": [],
+    "recommended_next_test": null,
+    "notes": "",
+    "status": "UNIT_TESTED"
+  },
+  "SQL.UPDATE": {
+    "evidence_level": "UNIT_TESTED",
+    "parser_function": "CobolParser._parse_exec_sql",
+    "generator_function": "NativeProgramGenerator._emit_exec_sql",
+    "runtime_helper": null,
+    "existing_tests": [
+      "tests/test_db2_acceptance.py"
+    ],
+    "known_limitations": [],
+    "unsupported_patterns": [],
+    "recommended_next_test": null,
+    "notes": "",
+    "status": "UNIT_TESTED"
+  },
+  "SQL.DELETE": {
+    "evidence_level": "UNIT_TESTED",
+    "parser_function": "CobolParser._parse_exec_sql",
+    "generator_function": "NativeProgramGenerator._emit_exec_sql",
+    "runtime_helper": null,
+    "existing_tests": [
+      "tests/test_db2_acceptance.py"
+    ],
+    "known_limitations": [],
+    "unsupported_patterns": [],
+    "recommended_next_test": null,
+    "notes": "",
+    "status": "UNIT_TESTED"
+  },
+  "SQL.CURSOR": {
+    "evidence_level": "UNIT_TESTED",
+    "parser_function": "CobolParser._parse_exec_sql",
+    "generator_function": "NativeProgramGenerator._emit_exec_sql",
+    "runtime_helper": null,
+    "existing_tests": [
+      "tests/test_db2_acceptance.py"
+    ],
+    "known_limitations": [
+      "Cursor paging not differentially verified"
+    ],
+    "unsupported_patterns": [],
+    "recommended_next_test": null,
+    "notes": "",
+    "status": "UNIT_TESTED"
+  },
+  "SQL.NULL_INDICATORS": {
+    "evidence_level": "UNIT_TESTED",
+    "parser_function": "CobolParser._parse_exec_sql",
+    "generator_function": "NativeProgramGenerator._emit_exec_sql",
+    "runtime_helper": null,
+    "existing_tests": [
+      "tests/test_db2_dialect_null_indicators.py"
+    ],
+    "known_limitations": [],
+    "unsupported_patterns": [],
+    "recommended_next_test": null,
+    "notes": "",
+    "status": "UNIT_TESTED"
+  },
+  "SQL.COMMIT_ROLLBACK": {
+    "evidence_level": "UNIT_TESTED",
+    "parser_function": "CobolParser._parse_exec_sql",
+    "generator_function": "NativeProgramGenerator._emit_exec_sql",
+    "runtime_helper": null,
+    "existing_tests": [
+      "tests/test_db2_stage1.py"
+    ],
+    "known_limitations": [
+      "Transaction boundary behavior not differentially verified"
+    ],
+    "unsupported_patterns": [],
+    "recommended_next_test": "Differential commit/rollback visibility test",
+    "notes": "",
+    "status": "UNIT_TESTED"
+  },
+  "SQL.SQLCODE_SQLSTATE": {
+    "evidence_level": "UNIT_TESTED",
+    "parser_function": "CobolParser._parse_exec_sql",
+    "generator_function": "NativeProgramGenerator._emit_exec_sql",
+    "runtime_helper": null,
+    "existing_tests": [
+      "tests/test_db2_error_mapper.py"
+    ],
+    "known_limitations": [
+      "SQLCODE values not captured in parity harness ExecutionResult"
+    ],
+    "unsupported_patterns": [],
+    "recommended_next_test": null,
+    "notes": "",
+    "status": "UNIT_TESTED"
+  },
+  "SQL.HOST_VARIABLES": {
+    "evidence_level": "UNIT_TESTED",
+    "parser_function": "CobolParser._parse_exec_sql",
+    "generator_function": "NativeProgramGenerator._emit_exec_sql",
+    "runtime_helper": null,
+    "existing_tests": [
+      "tests/test_db2_acceptance.py"
+    ],
+    "known_limitations": [],
+    "unsupported_patterns": [],
+    "recommended_next_test": null,
+    "notes": "",
+    "status": "UNIT_TESTED"
+  },
+  "CICS.SEND_MAP": {
+    "evidence_level": "PARSED_ONLY",
+    "parser_function": "CobolParser._parse_exec_cics",
+    "generator_function": "NativeProgramGenerator._emit_exec_cics (stub)",
+    "runtime_helper": null,
+    "existing_tests": [
+      "tests/test_cics_modernization.py"
+    ],
+    "known_limitations": [
+      "Stubbed; no BMS map semantics generated"
+    ],
+    "unsupported_patterns": [
+      "EXEC CICS SEND MAP MAPONLY ERASEAUP"
+    ],
+    "recommended_next_test": "Add CICS command support matrix test",
+    "notes": "",
+    "status": "PARSED_ONLY"
+  },
+  "CICS.RECEIVE_MAP": {
+    "evidence_level": "PARSED_ONLY",
+    "parser_function": "CobolParser._parse_exec_cics",
+    "generator_function": "NativeProgramGenerator._emit_exec_cics (stub)",
+    "runtime_helper": null,
+    "existing_tests": [
+      "tests/test_cics_modernization.py"
+    ],
+    "known_limitations": [
+      "Stubbed only"
+    ],
+    "unsupported_patterns": [],
+    "recommended_next_test": null,
+    "notes": "",
+    "status": "PARSED_ONLY"
+  },
+  "CICS.LINK": {
+    "evidence_level": "PARSED_ONLY",
+    "parser_function": "CobolParser._parse_exec_cics",
+    "generator_function": "NativeProgramGenerator._emit_exec_cics (stub)",
+    "runtime_helper": null,
+    "existing_tests": [
+      "tests/test_cics_modernization.py"
+    ],
+    "known_limitations": [],
+    "unsupported_patterns": [],
+    "recommended_next_test": null,
+    "notes": "",
+    "status": "PARSED_ONLY"
+  },
+  "CICS.RETURN": {
+    "evidence_level": "PARSED_ONLY",
+    "parser_function": "CobolParser._parse_exec_cics",
+    "generator_function": "NativeProgramGenerator._emit_exec_cics (stub)",
+    "runtime_helper": null,
+    "existing_tests": [
+      "tests/test_cics_modernization.py"
+    ],
+    "known_limitations": [],
+    "unsupported_patterns": [],
+    "recommended_next_test": null,
+    "notes": "",
+    "status": "PARSED_ONLY"
+  },
+  "CICS.RESP_RESP2": {
+    "evidence_level": "PARSED_ONLY",
+    "parser_function": "CobolParser._parse_exec_cics",
+    "generator_function": "NativeProgramGenerator._emit_exec_cics (stub)",
+    "runtime_helper": null,
+    "existing_tests": [
+      "tests/test_cics_map_semantics.py"
+    ],
+    "known_limitations": [
+      "RESP/RESP2 fields set to 0 by stub; not behaviorally verified"
+    ],
+    "unsupported_patterns": [],
+    "recommended_next_test": "CICS command support matrix with RESP routing",
+    "notes": "",
+    "status": "PARSED_ONLY"
+  },
+  "CICS.UNSUPPORTED_COMMANDS": {
+    "evidence_level": "PARSED_ONLY",
+    "parser_function": null,
+    "generator_function": null,
+    "runtime_helper": null,
+    "existing_tests": [],
+    "known_limitations": [
+      "All non-SEND/RECEIVE/LINK/RETURN commands stubbed with diagnostic comment"
+    ],
+    "unsupported_patterns": [
+      "EXEC CICS READ",
+      "EXEC CICS WRITE",
+      "EXEC CICS REWRITE",
+      "EXEC CICS DELETE",
+      "EXEC CICS STARTBR",
+      "EXEC CICS READNEXT",
+      "EXEC CICS ENDBR",
+      "EXEC CICS GETMAIN",
+      "EXEC CICS FREEMAIN",
+      "EXEC CICS ENQ",
+      "EXEC CICS DEQ",
+      "EXEC CICS SYNCPOINT"
+    ],
+    "recommended_next_test": "Add COBOL_UNSUPPORTED_CICS_COMMAND diagnostic test",
+    "notes": "",
+    "status": "PARSED_ONLY"
+  },
+  "JCL.JOB_CARD": {
+    "evidence_level": "UNIT_TESTED",
+    "parser_function": "JclParser._parse_job_card",
+    "generator_function": "JclGenerator._emit_job",
+    "runtime_helper": null,
+    "existing_tests": [
+      "tests/test_jcl_modernization.py"
+    ],
+    "known_limitations": [
+      "JOB card parameters not fully mapped"
+    ],
+    "unsupported_patterns": [],
+    "recommended_next_test": null,
+    "notes": "",
+    "status": "UNIT_TESTED"
+  },
+  "JCL.EXEC_PGM": {
+    "evidence_level": "UNIT_TESTED",
+    "parser_function": "JclParser._parse_exec_card",
+    "generator_function": "JclGenerator._emit_exec",
+    "runtime_helper": null,
+    "existing_tests": [
+      "tests/test_jcl_modernization.py"
+    ],
+    "known_limitations": [
+      "COND parameter routing partial"
+    ],
+    "unsupported_patterns": [],
+    "recommended_next_test": null,
+    "notes": "",
+    "status": "UNIT_TESTED"
+  },
+  "JCL.DD_STATEMENT": {
+    "evidence_level": "UNIT_TESTED",
+    "parser_function": "JclParser._parse_dd_card",
+    "generator_function": "JclGenerator._emit_dd",
+    "runtime_helper": null,
+    "existing_tests": [
+      "tests/test_jcl_modernization.py"
+    ],
+    "known_limitations": [
+      "Dataset disposition (DISP=SHR/NEW/OLD) not modeled"
+    ],
+    "unsupported_patterns": [
+      "DISP=MOD",
+      "UNIT=TAPE",
+      "SPACE=(CYL,(n,m))"
+    ],
+    "recommended_next_test": null,
+    "notes": "",
+    "status": "UNIT_TESTED"
+  },
+  "JCL.COND_PARAMETER": {
+    "evidence_level": "UNIT_TESTED",
+    "parser_function": "JclParser._parse_cond",
+    "generator_function": "JclGenerator._emit_cond",
+    "runtime_helper": null,
+    "existing_tests": [
+      "tests/test_jcl_symbols_complete.py"
+    ],
+    "known_limitations": [
+      "COND=ONLY and COND=EVEN not separately verified"
+    ],
+    "unsupported_patterns": [
+      "COND=ONLY",
+      "COND=EVEN"
+    ],
+    "recommended_next_test": "Differential JCL COND conditional bypass fixture",
+    "notes": "",
+    "status": "UNIT_TESTED"
+  },
+  "JCL.IF_THEN_ELSE": {
+    "evidence_level": "GENERATED_ONLY",
+    "parser_function": "JclParser._parse_if_stmt",
+    "generator_function": "JclGenerator._emit_if",
+    "runtime_helper": null,
+    "existing_tests": [],
+    "known_limitations": [
+      "IF/THEN/ELSE block routing generated but not differentially verified"
+    ],
+    "unsupported_patterns": [],
+    "recommended_next_test": "Differential JCL IF/THEN/ELSE step routing fixture",
+    "notes": "",
+    "status": "GENERATED_ONLY"
+  },
+  "JCL.SYMBOLS": {
+    "evidence_level": "UNIT_TESTED",
+    "parser_function": "JclParser._parse_symbols",
+    "generator_function": "JclGenerator._emit_symbols",
+    "runtime_helper": null,
+    "existing_tests": [
+      "tests/test_jcl_symbols_complete.py"
+    ],
+    "known_limitations": [],
+    "unsupported_patterns": [],
+    "recommended_next_test": null,
+    "notes": "",
+    "status": "UNIT_TESTED"
+  },
+  "IMS.DLI": {
+    "evidence_level": "UNSUPPORTED",
+    "parser_function": null,
+    "generator_function": null,
+    "runtime_helper": null,
+    "existing_tests": [],
+    "known_limitations": [
+      "EXEC DLI blocked at baseline; stubbed in transpile preprocessing"
+    ],
+    "unsupported_patterns": [
+      "EXEC DLI CALL 'CBLTDLI'",
+      "CALL 'AIBTDLI'",
+      "CALL 'DFSRRC00'"
+    ],
+    "recommended_next_test": "Add COBOL_UNSUPPORTED_IMS_CALL diagnostic test",
+    "notes": "",
+    "status": "UNSUPPORTED"
+  },
+  "MQ.SERIES": {
+    "evidence_level": "UNSUPPORTED",
+    "parser_function": null,
+    "generator_function": null,
+    "runtime_helper": null,
+    "existing_tests": [],
+    "known_limitations": [
+      "IBM MQ copybooks not bundled; compilation fails at baseline"
+    ],
+    "unsupported_patterns": [
+      "CALL 'MQPUT'",
+      "CALL 'MQGET'",
+      "COPY CMQV",
+      "COPY CMQODV"
+    ],
+    "recommended_next_test": "Add COBOL_UNSUPPORTED_MQ_CALL diagnostic and mock MQ copybooks",
+    "notes": "",
+    "status": "UNSUPPORTED"
+  },
+  "REPORT_WRITER": {
+    "evidence_level": "PARSED_ONLY",
+    "parser_function": "CobolParser._parse_report_section",
+    "generator_function": null,
+    "runtime_helper": null,
+    "existing_tests": [],
+    "known_limitations": [
+      "Report Writer section parsed but not generated"
+    ],
+    "unsupported_patterns": [
+      "INITIATE",
+      "GENERATE",
+      "TERMINATE"
+    ],
+    "recommended_next_test": "Add COBOL_UNSUPPORTED_REPORT_WRITER diagnostic",
+    "notes": "",
+    "status": "PARSED_ONLY"
+  },
+  "SORT_MERGE": {
+    "evidence_level": "UNIT_TESTED",
+    "parser_function": "CobolParser._parse_sort_stmt",
+    "generator_function": "NativeProgramGenerator._emit_sort",
+    "runtime_helper": null,
+    "existing_tests": [
+      "tests/test_phase8_sort_merge.py"
+    ],
+    "known_limitations": [
+      "SORT with USING/GIVING file only; SORT with INPUT PROCEDURE not fully verified"
+    ],
+    "unsupported_patterns": [],
+    "recommended_next_test": "Differential SORT with INPUT/OUTPUT PROCEDURE fixture",
+    "notes": "",
+    "status": "UNIT_TESTED"
+  },
+  "POINTER_FIELDS": {
+    "evidence_level": "UNIT_TESTED",
+    "parser_function": "CobolParser._parse_data_item",
+    "generator_function": "NativeProgramGenerator._emit_pointer",
+    "runtime_helper": null,
+    "existing_tests": [
+      "tests/test_phase8_pointers.py"
+    ],
+    "known_limitations": [
+      "SET ADDRESS OF not differentially verified"
+    ],
+    "unsupported_patterns": [
+      "SET ADDRESS OF linkage item"
+    ],
+    "recommended_next_test": null,
+    "notes": "",
+    "status": "UNIT_TESTED"
+  },
+  "NEXT_SENTENCE": {
+    "evidence_level": "UNIT_TESTED",
+    "parser_function": "CobolParser._parse_next_sentence",
+    "generator_function": "NativeProgramGenerator._emit_next_sentence",
+    "runtime_helper": null,
+    "existing_tests": [
+      "tests/test_phase8_next_sentence.py"
+    ],
+    "known_limitations": [],
+    "unsupported_patterns": [],
+    "recommended_next_test": null,
+    "notes": "",
+    "status": "UNIT_TESTED"
+  }
+}

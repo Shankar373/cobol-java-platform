@@ -1,0 +1,13 @@
+//JCLINVALID01 JOB (ACCT),'SYSTEMA',CLASS=A
+//* 1. Invalid EXEC step (missing PGM or PROC)
+//STEPBAD  EXEC
+//* 2. Unresolved PROC name
+//STEPUND  EXEC UNDEFPROC
+//* 3. Unresolved symbol reference
+//STEP1    EXEC PGM=COBPROG1
+//INPUTDD  DD DSN=&UNDEFVAR,DISP=SHR
+//* 4. Invalid COND parameter
+//STEP2    EXEC PGM=COBPROG2,COND=(ABC,EQ)
+//* 5. Unresolved dataset
+//STEP3    EXEC PGM=COBPROG3
+//REPORTDD DD DSN=&UNDEFVAR.DATA,DISP=OLD

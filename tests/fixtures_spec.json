@@ -1,0 +1,294 @@
+[
+  {
+    "name": "milestone_b_pic9_integer_arithmetic_baseline",
+    "program_name": "PIC9BASE",
+    "variables": [
+      {"name": "A", "pic": "9(4)", "value": "15"},
+      {"name": "B", "pic": "9(4)", "value": "25"},
+      {"name": "C", "pic": "9(4)", "value": "0"}
+    ],
+    "statements": [
+      "ADD A TO B GIVING C",
+      "DISPLAY WS-GROUP",
+      "SUBTRACT A FROM B GIVING C",
+      "DISPLAY WS-GROUP",
+      "MULTIPLY A BY B GIVING C",
+      "DISPLAY WS-GROUP"
+    ]
+  },
+  {
+    "name": "milestone_b_pics9_signed_arithmetic",
+    "program_name": "SIGNEDAR",
+    "variables": [
+      {"name": "A", "pic": "S9(4)", "value": "-15"},
+      {"name": "B", "pic": "S9(4)", "value": "25"},
+      {"name": "C", "pic": "S9(4)", "value": "0"}
+    ],
+    "statements": [
+      "ADD A TO B GIVING C",
+      "DISPLAY WS-GROUP",
+      "SUBTRACT B FROM A GIVING C",
+      "DISPLAY WS-GROUP",
+      "MULTIPLY A BY B GIVING C",
+      "DISPLAY WS-GROUP"
+    ]
+  },
+  {
+    "name": "milestone_b_pic9v99_implied_decimal_assignment",
+    "program_name": "IMPDEC",
+    "variables": [
+      {"name": "A", "pic": "9(4)V99", "value": "12.34"},
+      {"name": "B", "pic": "9(4)V99", "value": "0"}
+    ],
+    "statements": [
+      "MOVE 45.67 TO B",
+      "DISPLAY WS-GROUP"
+    ]
+  },
+  {
+    "name": "milestone_b_division_scale_normalization",
+    "program_name": "DIVSCALE",
+    "variables": [
+      {"name": "A", "pic": "9(4)V99", "value": "10.00"},
+      {"name": "B", "pic": "9(4)V99", "value": "3.00"},
+      {"name": "C", "pic": "9(4)V99", "value": "0"}
+    ],
+    "statements": [
+      "DIVIDE A BY B GIVING C",
+      "DISPLAY WS-GROUP"
+    ]
+  },
+  {
+    "name": "milestone_b_rounded_arithmetic",
+    "program_name": "ROUNDEDAR",
+    "variables": [
+      {"name": "A", "pic": "9(4)V999", "value": "1.236"},
+      {"name": "B", "pic": "9(4)V99", "value": "0"}
+    ],
+    "statements": [
+      "COMPUTE B ROUNDED = A",
+      "DISPLAY WS-GROUP"
+    ]
+  },
+  {
+    "name": "milestone_b_non_rounded_truncation_arithmetic",
+    "program_name": "TRUNCAR",
+    "variables": [
+      {"name": "A", "pic": "9(4)V999", "value": "1.236"},
+      {"name": "B", "pic": "9(4)V99", "value": "0"}
+    ],
+    "statements": [
+      "COMPUTE B = A",
+      "DISPLAY WS-GROUP"
+    ]
+  },
+  {
+    "name": "milestone_b_positive_target_field_overflow",
+    "program_name": "POSOVER",
+    "variables": [
+      {"name": "A", "pic": "9(2)", "value": "99"},
+      {"name": "B", "pic": "9(2)", "value": "10"}
+    ],
+    "statements": [
+      "ADD 5 TO A GIVING B ON SIZE ERROR DISPLAY 'OVERFLOW'",
+      "DISPLAY WS-GROUP"
+    ]
+  },
+  {
+    "name": "milestone_b_negative_target_field_overflow",
+    "program_name": "NEGOVER",
+    "variables": [
+      {"name": "A", "pic": "S9(2)", "value": "-99"},
+      {"name": "B", "pic": "S9(2)", "value": "-10"}
+    ],
+    "statements": [
+      "SUBTRACT 5 FROM A GIVING B ON SIZE ERROR DISPLAY 'UNDERFLOW'",
+      "DISPLAY WS-GROUP"
+    ]
+  },
+  {
+    "name": "milestone_b_zero_fill_formatting",
+    "program_name": "ZEROFILL",
+    "variables": [
+      {"name": "A", "pic": "9(5)", "value": "42"}
+    ],
+    "statements": [
+      "DISPLAY WS-GROUP"
+    ]
+  },
+  {
+    "name": "milestone_b_unsigned_drops_sign",
+    "program_name": "DROPSIGN",
+    "variables": [
+      {"name": "A", "pic": "9(3)", "value": "0"}
+    ],
+    "statements": [
+      "MOVE -5 TO A",
+      "DISPLAY WS-GROUP"
+    ]
+  },
+  {
+    "name": "milestone_b_multi_receiver",
+    "program_name": "MULTIRCV",
+    "variables": [
+      {"name": "A", "pic": "9(4)V99", "value": "1.236"},
+      {"name": "B", "pic": "9(4)V9", "value": "0"},
+      {"name": "C", "pic": "9(4)V99", "value": "0"}
+    ],
+    "statements": [
+      "ADD A TO B C",
+      "DISPLAY WS-GROUP"
+    ]
+  },
+  {
+    "name": "milestone_b_divide_remainder",
+    "program_name": "DIVREM",
+    "variables": [
+      {"name": "A", "pic": "9(4)", "value": "10"},
+      {"name": "B", "pic": "9(4)", "value": "3"},
+      {"name": "Q", "pic": "9(4)", "value": "0"},
+      {"name": "R", "pic": "9(4)", "value": "0"}
+    ],
+    "statements": [
+      "DIVIDE A BY B GIVING Q REMAINDER R",
+      "DISPLAY WS-GROUP"
+    ]
+  },
+  {
+    "name": "milestone_b_comp3_roundtrip",
+    "program_name": "COMP3RT",
+    "variables": [
+      {"name": "A", "pic": "S9(4)V99", "value": "-12.34", "usage": "COMP-3"},
+      {"name": "B", "pic": "9(4)V99", "value": "12.34", "usage": "COMP-3"}
+    ],
+    "statements": [
+      "DISPLAY WS-GROUP"
+    ]
+  },
+  {
+    "name": "milestone_b_division_terminating",
+    "program_name": "DIVTERM",
+    "variables": [
+      {"name": "C1", "pic": "V9(2)", "value": "0"},
+      {"name": "C2", "pic": "9(2)V9(9)", "value": "0"}
+    ],
+    "statements": [
+      "DIVIDE 1 BY 3 GIVING C1",
+      "DIVIDE 10 BY 3 GIVING C2",
+      "DISPLAY WS-GROUP"
+    ]
+  },
+  {
+    "name": "milestone_b_compute_mixed",
+    "program_name": "COMPMIX",
+    "variables": [
+      {"name": "A", "pic": "9(4)V99", "value": "12.34"},
+      {"name": "B", "pic": "9(4)V999", "value": "5.678"},
+      {"name": "C", "pic": "9(4)V9", "value": "0"}
+    ],
+    "statements": [
+      "COMPUTE C = A * B + 1.2",
+      "DISPLAY WS-GROUP"
+    ]
+  },
+  {
+    "name": "milestone_b_negative_halfway",
+    "program_name": "NEGHALF",
+    "variables": [
+      {"name": "A", "pic": "S9(4)V99", "value": "-1.235"},
+      {"name": "B", "pic": "S9(4)V9(2)", "value": "0"}
+    ],
+    "statements": [
+      "COMPUTE B ROUNDED = A",
+      "DISPLAY WS-GROUP"
+    ]
+  },
+  {
+    "name": "milestone_b_divide_by_zero_with_size_error",
+    "program_name": "DIVZEROW",
+    "variables": [
+      {"name": "A", "pic": "9(4)", "value": "10"},
+      {"name": "B", "pic": "9(4)", "value": "0"},
+      {"name": "C", "pic": "9(4)", "value": "5"}
+    ],
+    "statements": [
+      "DIVIDE A BY B GIVING C ON SIZE ERROR DISPLAY 'DIVBYZERO'",
+      "DISPLAY WS-GROUP"
+    ]
+  },
+  {
+    "name": "milestone_b_divide_by_zero_without_size_error",
+    "program_name": "DIVZEROWO",
+    "variables": [
+      {"name": "A", "pic": "9(4)", "value": "10"},
+      {"name": "B", "pic": "9(4)", "value": "0"},
+      {"name": "C", "pic": "9(4)", "value": "5"}
+    ],
+    "statements": [
+      "DIVIDE A BY B GIVING C",
+      "DISPLAY WS-GROUP"
+    ]
+  },
+  {
+    "name": "milestone_b_high_scale_divide",
+    "program_name": "HISCALE",
+    "variables": [
+      {"name": "A", "pic": "9(2)V9(20)", "value": "0"}
+    ],
+    "statements": [
+      "DIVIDE 1 BY 3 GIVING A",
+      "DISPLAY WS-GROUP"
+    ]
+  },
+  {
+    "name": "milestone_b_two_operand_display",
+    "program_name": "TWODISP",
+    "variables": [
+      {"name": "A", "pic": "9(4)", "value": "1234"},
+      {"name": "B", "pic": "9(4)", "value": "5678"}
+    ],
+    "statements": [
+      "DISPLAY A B"
+    ]
+  },
+  {
+    "name": "milestone_b_negative_subtract",
+    "program_name": "NEGSUB",
+    "variables": [
+      {"name": "A", "pic": "S9(4)", "value": "10"},
+      {"name": "X", "pic": "S9(4)", "value": "0"}
+    ],
+    "statements": [
+      "COMPUTE X = A - 1",
+      "DISPLAY WS-GROUP",
+      "COMPUTE X = A - -1",
+      "DISPLAY WS-GROUP",
+      "SUBTRACT 1 FROM A GIVING X",
+      "DISPLAY WS-GROUP"
+    ]
+  },
+  {
+    "name": "milestone_b_redefines_scalar_view",
+    "program_name": "REDEFSC",
+    "variables": [
+      {"name": "A", "pic": "X(4)", "value": "'1234'"},
+      {"name": "B", "pic": "9(4)", "redefines": "A"}
+    ],
+    "statements": [
+      "DISPLAY WS-GROUP",
+      "MOVE 5678 TO B",
+      "DISPLAY WS-GROUP"
+    ]
+  },
+  {
+    "name": "milestone_b_redefines_comp3_byte_view",
+    "program_name": "REDEFCP3",
+    "variables": [
+      {"name": "C", "pic": "S9(4)V99", "usage": "COMP-3", "value": "-12.34"},
+      {"name": "D", "pic": "X(3)", "redefines": "C"}
+    ],
+    "statements": [
+      "DISPLAY WS-GROUP"
+    ]
+  }
+]

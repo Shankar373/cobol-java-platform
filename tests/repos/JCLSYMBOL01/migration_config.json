@@ -1,0 +1,7 @@
+{
+  "main_program": "JCLSYMBOL01.jcl",
+  "file_assignments": {
+    "INPUTDD": "MY.INPUT.DATA",
+    "OUTPUTDD": "MY.OUTPUT.DATA"
+  }
+}

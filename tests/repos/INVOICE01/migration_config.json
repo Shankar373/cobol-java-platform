@@ -1,0 +1,13 @@
+{
+  "repository_name": "INVOICE01",
+  "description": "Flat-file batch invoice processing repository (Repository A - Gate B)",
+  "source_dir": "src",
+  "copybook_dirs": ["copybooks"],
+  "data_in_dir": "data/in",
+  "data_out_dir": "data/out",
+  "main_program": "INVOICE01",
+  "file_assignments": {
+    "IN-FILE":  "data/in/invoice-input.dat",
+    "OUT-FILE": "data/out/invoice-output.dat"
+  }
+}

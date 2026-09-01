@@ -1,4 +1,29 @@
-# Test-only dependencies. Not required for production runtime.
-pytest>=7.4
-pytest-timeout>=2.2
-pyyaml>=6.0
+# Development / test-only dependencies.
+#
+# The production platform itself (cobol_migrate.py, modernize/, execution/,
+# ui.py) uses ONLY the Python standard library — see requirements.txt.
+#
+# These packages are required solely by tests/test_phase11b_*.py, which drive
+# the real UI server over HTTP. Install with:
+#
+#     pip install -r requirements-dev.txt
+#     playwright install chromium      # one-time browser download for E2E
+#
+# Versions pinned to what CI and the current test environment use.
+
+requests>=2.31,<3
+playwright>=1.47,<2
+pytest>=7.0
+pyyaml
+
+
+# External tool prerequisites (NOT pip-installable; documented here because
+# the test suite shells out to them):
+#   - JDK 17+            (javac/java: ~15 suites compile+run generated Java)
+#   - Maven 3.9+         (mvn: enterprise compile checks; offline after seed)
+#   - Docker             (GnuCOBOL + opensourcecobol4j images for baseline /
+#                         transpile stages; suites that need it skip with
+#                         ENVIRONMENT_BLOCKED when absent)
+# Seed the Maven cache before first offline run:
+#   mvn -B -f docker/maven-seed-pom.xml dependency:resolve
+#   mvn -B -f docker/maven-proleap-seed-pom.xml dependency:resolve

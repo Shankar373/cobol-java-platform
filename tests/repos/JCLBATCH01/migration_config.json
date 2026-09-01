@@ -1,0 +1,9 @@
+{
+  "main_program": "JCLBATCH01.jcl",
+  "file_assignments": {
+    "INPUTDD": "MY.INPUT.DATA",
+    "OUTPUTDD": "MY.OUTPUT.DATA",
+    "REPORTDD": "MY.REPORT.DATA",
+    "FINALDD": "MY.FINAL.DATA"
+  }
+}

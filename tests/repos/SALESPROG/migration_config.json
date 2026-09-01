@@ -1,0 +1,13 @@
+{
+  "repository_name": "SALESPROG",
+  "description": "Nested CALL sales processing repository (Repository B - Gate C)",
+  "source_dir": "src",
+  "copybook_dirs": ["copybooks"],
+  "data_in_dir": "data/in",
+  "data_out_dir": "data/out",
+  "main_program": "SALESPROG",
+  "file_assignments": {
+    "SLS-FILE": "data/in/sales-input.dat",
+    "RPT-FILE": "data/out/sales-report.dat"
+  }
+}

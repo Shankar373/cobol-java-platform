@@ -1,0 +1,2067 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SystemaOps Audit Portal — COBOL → Java Modernization Platform</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+:root {
+  --bg: #07090e;
+  --surface: #0b0d16;
+  --surface2: #101322;
+  --surface3: #161a2e;
+  --border: #181d30;
+  --border2: #242c47;
+  --text: #f3f4f6;
+  --muted: #9ca3af;
+  --dim: #4b5563;
+  --acc: #1d7f8a; /* SystemaOps Teal */
+  --acc2: #38bdf8;
+  --acc-grad: linear-gradient(135deg, #1d7f8a 0%, #0d5c66 100%);
+  --purple-grad: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+  --ok: #10b981;
+  --ok-bg: rgba(16, 185, 129, 0.1);
+  --warn: #f59e0b;
+  --warn-bg: rgba(245, 158, 11, 0.1);
+  --err: #ef4444;
+  --err-bg: rgba(239, 68, 68, 0.1);
+  --pending-bg: rgba(75, 85, 99, 0.05);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+/* ---- Header ---- */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px;
+  background-color: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.logo-icon {
+  width: 32px;
+  height: 32px;
+  background: var(--acc-grad);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(29, 127, 138, 0.2);
+}
+.brand-name {
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: -0.01em;
+}
+.brand-sub {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 1px;
+}
+.online-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ok);
+  background: var(--ok-bg);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  padding: 3px 10px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.online-badge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--ok);
+  display: inline-block;
+}
+
+/* ---- App Main Split Screen ---- */
+.app-container {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  flex: 1;
+  overflow: hidden;
+}
+@media(max-width:900px){.app-container{grid-template-columns:1fr;}}
+.sidebar {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.sidebar-header {
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+}
+.sidebar-header h3 {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+}
+.runs-list {
+  flex: 1;
+  overflow-y: auto;
+}
+.run-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.run-item:hover {
+  background: var(--surface2);
+}
+.run-item.active {
+  background: var(--surface2);
+  border-left: 3px solid var(--acc);
+}
+.run-title {
+  font-weight: 600;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.run-meta {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+.chip {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+.chip-ready { background: var(--pending-bg); color: var(--muted); }
+.chip-running { background: rgba(56, 189, 248, 0.15); color: var(--acc2); }
+.chip-done { background: var(--ok-bg); color: var(--ok); }
+.chip-error { background: var(--err-bg); color: var(--err); }
+.chip-interrupted { background: var(--warn-bg); color: var(--warn); }
+
+/* ---- Content Area ---- */
+.content-area {
+  padding: 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ---- Center Container ---- */
+.center-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+.upload-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 32px;
+  max-width: 580px;
+  width: 100%;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.5);
+}
+.upload-card h2 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  letter-spacing: -0.01em;
+}
+.upload-card p {
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+.tab-row {
+  display: flex;
+  gap: 16px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 20px;
+}
+.tab-btn {
+  padding: 10px 4px;
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+}
+.tab-btn.active {
+  color: var(--acc2);
+  border-bottom-color: var(--acc);
+}
+.dropzone {
+  border: 2px dashed var(--border2);
+  border-radius: 8px;
+  padding: 32px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: rgba(16, 19, 34, 0.4);
+  position: relative;
+}
+.dropzone:hover {
+  border-color: var(--acc);
+  background: rgba(29, 127, 138, 0.04);
+}
+.dropzone input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.dropzone-icon {
+  font-size: 32px;
+  margin-bottom: 12px;
+}
+.dropzone-text {
+  font-size: 13px;
+  color: var(--muted);
+}
+.dropzone-text span {
+  color: var(--acc2);
+  font-weight: 600;
+}
+.selected-file-box {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16px;
+}
+.selected-file-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+.btn-clear {
+  background: var(--surface3);
+  color: var(--text);
+  border: 1px solid var(--border2);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-clear:hover {
+  background: var(--border2);
+}
+.btn-action {
+  background: var(--acc-grad);
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(29, 127, 138, 0.2);
+  transition: all 0.2s;
+}
+.btn-action:hover {
+  opacity: 0.95;
+  transform: translateY(-1px);
+}
+.action-btn-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+/* ---- Control Panel Buttons ---- */
+.controls-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 16px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.control-btn {
+  background: var(--surface3);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.control-btn:hover {
+  background: var(--border2);
+}
+.control-btn.primary {
+  background: var(--acc-grad);
+  border: none;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(29,127,138,0.25);
+}
+.control-btn.danger {
+  background: var(--err-bg);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: var(--err);
+}
+.control-btn.danger:hover {
+  background: rgba(239, 68, 68, 0.2);
+}
+.control-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+select.control-select {
+  background: var(--surface3);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  outline: none;
+  cursor: pointer;
+}
+
+/* ---- Verdict Panel ---- */
+.verdict-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+.verdict-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.verdict-badge {
+  font-size: 14px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.verdict-desc {
+  padding: 16px 20px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--muted);
+  background: rgba(16, 19, 34, 0.3);
+}
+.status-info-box {
+  padding: 10px 20px;
+  font-size: 12px;
+  font-weight: 500;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.status-info-box.info {
+  background: rgba(56, 189, 248, 0.05);
+  color: var(--acc2);
+  border-bottom: 1px solid rgba(56, 189, 248, 0.1);
+}
+.status-info-box.success {
+  background: rgba(16, 185, 129, 0.05);
+  color: var(--ok);
+  border-bottom: 1px solid rgba(16, 185, 129, 0.1);
+}
+.status-info-box.error {
+  background: rgba(244, 63, 94, 0.05);
+  color: var(--err);
+  border-bottom: 1px solid rgba(244, 63, 94, 0.1);
+}
+.verdict-status-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 1px solid transparent;
+}
+.verdict-status-badge.chip-running {
+  background: rgba(56, 189, 248, 0.15);
+  color: var(--acc2);
+  border-color: rgba(56, 189, 248, 0.3);
+}
+.verdict-status-badge.chip-done {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--ok);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+.verdict-status-badge.chip-error {
+  background: rgba(244, 63, 94, 0.15);
+  color: var(--err);
+  border-color: rgba(244, 63, 94, 0.3);
+}
+.verdict-status-badge.chip-ready {
+  background: rgba(100, 116, 139, 0.15);
+  color: var(--muted);
+  border-color: rgba(100, 116, 139, 0.3);
+}
+.verdict-status-badge.chip-interrupted {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--warn);
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+
+/* ---- Summary & Evidence Grid ---- */
+.summary-grid {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 16px;
+}
+@media(max-width:1100px){.summary-grid{grid-template-columns:1fr;}}
+
+/* ---- Repository Card ---- */
+.repo-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px 20px;
+}
+.section-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.repo-metric-row {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.repo-metric {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(24, 29, 48, 0.5);
+}
+.repo-metric:last-child {
+  border-bottom: none;
+}
+.repo-label { color: var(--muted); }
+.repo-val { font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+
+/* ---- Evidence Grid ---- */
+.evidence-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+.evidence-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+  transition: transform 0.15s, border-color 0.15s;
+}
+.evidence-card:hover {
+  border-color: var(--border2);
+  transform: translateY(-1px);
+}
+.evidence-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.evidence-card-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text);
+}
+.evidence-badge {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+.evidence-desc {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.evidence-metrics {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--acc2);
+}
+.evidence-action {
+  font-size: 11px;
+  color: var(--acc2);
+  text-decoration: none;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-block;
+  margin-top: 4px;
+}
+.evidence-action:hover {
+  text-decoration: underline;
+}
+
+/* ---- Tabs Layout ---- */
+.tabs-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+}
+.tabs-header {
+  display: flex;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  padding: 0 16px;
+  gap: 8px;
+}
+.panel-tab {
+  padding: 14px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+}
+.panel-tab:hover {
+  color: var(--text);
+}
+.panel-tab.active {
+  color: var(--acc2);
+  border-bottom-color: var(--acc);
+}
+.panel-body {
+  padding: 20px;
+  flex: 1;
+}
+
+/* ---- Stepper Details ---- */
+.stage-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.stage-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 13px;
+  transition: border-color 0.15s;
+}
+.stage-step.done { border-left: 3px solid var(--ok); }
+.stage-step.running { border-left: 3px solid var(--acc); }
+.stage-step.error { border-left: 3px solid var(--err); }
+.stage-step.pending { border-left: 3px solid var(--dim); opacity: 0.65; }
+
+.stage-num {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--surface3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+}
+.stage-step.done .stage-num { background: var(--ok-bg); color: var(--ok); }
+.stage-step.running .stage-num { background: rgba(56, 189, 248, 0.15); color: var(--acc2); }
+.stage-step.error .stage-num { background: var(--err-bg); color: var(--err); }
+
+.stage-title { font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.stage-desc { font-size: 11px; color: var(--muted); margin-top: 4px; }
+.stage-detail {
+  margin-top: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--acc2);
+  white-space: pre-wrap;
+  background: var(--bg);
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+}
+.stage-status-badge {
+  margin-left: auto;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+.stage-step.done .stage-status-badge { background: var(--ok-bg); color: var(--ok); }
+.stage-step.running .stage-status-badge { background: rgba(56, 189, 248, 0.15); color: var(--acc2); }
+.stage-step.error .stage-status-badge { background: var(--err-bg); color: var(--err); }
+.stage-step.pending .stage-status-badge { background: var(--pending-bg); color: var(--muted); }
+
+/* ---- Log Window ---- */
+.log-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+}
+.log-window {
+  background: #04060a;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  line-height: 1.6;
+  color: #9cb3d5;
+  padding: 16px;
+  height: 480px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+}
+.log-line-info { color: #9cb3d5; }
+.log-line-warn { color: var(--warn); font-weight: 500; }
+.log-line-err { color: var(--err); font-weight: 600; }
+.log-line-ok { color: var(--ok); font-weight: 500; }
+
+/* ---- Unified Explorer ---- */
+.explorer-grid {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 20px;
+  min-height: 480px;
+}
+.tree-panel {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  overflow-y: auto;
+  max-height: 520px;
+}
+.tree-node {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  cursor: pointer;
+  padding: 5px 8px;
+  border-radius: 4px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.tree-node:hover {
+  background: var(--surface3);
+  color: var(--text);
+}
+.tree-node.active {
+  background: var(--surface3);
+  color: var(--text);
+  border-left: 2px solid var(--acc2);
+}
+.tree-dir {
+  font-weight: 600;
+  color: var(--text);
+  margin-top: 8px;
+  margin-bottom: 4px;
+  font-size: 11px;
+}
+.code-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.code-header {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--acc2);
+  padding: 4px 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.code-window {
+  background: #04060a;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  margin: 0;
+  overflow: auto;
+  max-height: 480px;
+  min-height: 380px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  line-height: 1.6;
+  color: #9cb3d5;
+  white-space: pre;
+}
+
+/* ---- Report Center & Manifest ---- */
+.reports-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+.report-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+}
+.report-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+.report-meta {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+.report-actions {
+  display: flex;
+  gap: 10px;
+}
+.report-btn {
+  background: var(--surface3);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  text-align: center;
+}
+.report-btn:hover { background: var(--border2); }
+
+/* ---- Equivalence Section ---- */
+.equiv-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+@media(max-width:1000px){.equiv-grid{grid-template-columns: 1fr;}}
+.equiv-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px 20px;
+}
+.equiv-card-header {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--acc2);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.equiv-field-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px 16px;
+  font-size: 12px;
+  margin-bottom: 12px;
+}
+.equiv-label { color: var(--muted); }
+.equiv-val { font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="brand">
+    <div class="logo-icon">S</div>
+    <div>
+      <h1 class="brand-name">SystemaOps Portal</h1>
+      <p class="brand-sub">COBOL-to-Java Modernization Portal</p>
+    </div>
+  </div>
+  <div style="display:flex; align-items:center; gap:16px;">
+    <span class="online-badge" id="backendStatus">Active Connection</span>
+  </div>
+</header>
+
+<div id="mainContainer" class="center-container">
+  <!-- Ingest Upload Container dynamically loaded here -->
+</div>
+
+<script>
+// Global UI Controller State
+let sel = localStorage.getItem('sel') || '';
+let busy = false;
+let activeRunData = null;
+let currentPanelTab = 'pipeline';
+let renderedView = null;
+let prevRunStatus = null;
+
+// Helpers
+function $(id) { return document.getElementById(id); }
+
+async function api(url, payload = null) {
+  const method = payload ? 'POST' : 'GET';
+  const opt = {
+    method,
+    headers: { 'Content-Type': 'application/json' }
+  };
+  if (payload) opt.body = JSON.stringify(payload);
+  const response = await fetch(url, opt);
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(errText || `HTTP ${response.status}`);
+  }
+  return response.json();
+}
+
+function escapeHtml(s) {
+  if (s === undefined || s === null) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function escapeJs(s) {
+  // HTML-attribute-context safe escaping: raw quotes/backslashes/angle brackets
+  // must never survive, otherwise uploaded filenames can break out of the
+  // attribute and execute script. encodeURIComponent neutralizes all
+  // structural characters; the decode side uses decodeURIComponent.
+  return encodeURIComponent(String(s));
+}
+
+function decodeJs(s) {
+  try { return decodeURIComponent(String(s)); } catch (e) { return String(s); }
+}
+
+// Ingestion handlers
+function onFileSelected(el) {
+  const file = el.files[0];
+  if (file) {
+    $('fileName').textContent = file.name;
+    $('fileSize').textContent = `(${(file.size / 1024).toFixed(1)} KB)`;
+    $('fileSelectedBox').style.display = 'flex';
+    $('dropZone').style.display = 'none';
+  }
+}
+
+function clearSelectedFile() {
+  $('zipFile').value = '';
+  $('fileName').textContent = '';
+  $('fileSize').textContent = '';
+  $('fileSelectedBox').style.display = 'none';
+  $('dropZone').style.display = 'block';
+}
+
+let inTab = 'zip';
+function setInTab(tab) {
+  inTab = tab;
+  $('tabUpload').classList.toggle('active', tab === 'zip');
+  $('tabClone').classList.toggle('active', tab === 'git');
+  $('zipInputBox').style.display = tab === 'zip' ? '' : 'none';
+  $('gitInputBox').style.display = tab === 'git' ? '' : 'none';
+}
+
+async function ingest() {
+  if (busy) return;
+  busy = true;
+  if ($('analyzeBtn')) $('analyzeBtn').disabled = true;
+  try {
+    let payload;
+    if (inTab === 'zip') {
+      const f = $('zipFile').files[0];
+      if (!f) { alert('Please select a project ZIP archive first.'); return; }
+      const buf = await f.arrayBuffer();
+      payload = { source: 'zip', name: f.name, data: bytesToBase64(new Uint8Array(buf)) };
+    } else {
+      const url = $('gitUrl').value.trim();
+      if (!url) { alert('Please enter a Git URL.'); return; }
+      payload = { source: 'git', name: 'git-run', url, branch: $('gitBranch').value.trim() };
+    }
+    const res = await api('/api/ingest', payload);
+    if (res.ok) {
+      sel = res.run_id;
+      localStorage.setItem('sel', sel);
+      poll();
+    } else {
+      alert('Ingest failed: ' + (res.error || 'unknown error'));
+    }
+  } catch(e) {
+    alert('Ingest failed: ' + e.message);
+  } finally {
+    busy = false;
+    if ($('analyzeBtn')) $('analyzeBtn').disabled = false;
+  }
+}
+
+function bytesToBase64(bytes) {
+  let bin = ''; const chunk = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunk)
+    bin += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+  return btoa(bin);
+}
+
+// Action Buttons
+async function runIt(restartFrom) {
+  if (!sel) return;
+  await api('/api/run', { run_id: sel, restart_from: restartFrom });
+  poll();
+}
+
+async function resetRun() {
+  if (!sel || !confirm('Reset this workspace and delete target outputs?')) return;
+  const currentSel = sel;
+  // Clear frontend state immediately
+  clearActiveWorkspaceState();
+  await api('/api/reset', { run_id: currentSel });
+  poll();
+}
+
+function clearActiveWorkspaceState() {
+  sel = '';
+  localStorage.removeItem('sel');
+  activeRunData = null;
+  prevRunStatus = null;
+  renderedView = null;
+  closeLogStream();
+  $('mainContainer').innerHTML = '';
+}
+
+async function stopPipeline() {
+  if (!sel) return;
+  if (!confirm('Are you sure you want to cancel the running pipeline?')) return;
+  try {
+    const res = await api('/api/stop', { run_id: sel });
+    if (res.ok) {
+      alert("Cancellation request sent successfully.");
+      poll();
+    } else {
+      alert("Stop failed: " + (res.error || 'unknown error'));
+    }
+  } catch(e) {
+    alert("Stop failed: " + e.message);
+  }
+}
+
+// Select Workspaces
+function selectRun(runId) {
+  runId = decodeJs(runId); // onclick handlers pass encoded values (XSS-safe)
+  if (logSource) {
+    closeLogStream();
+  }
+  sel = runId;
+  localStorage.setItem('sel', sel);
+  renderedView = null;
+  poll();
+}
+
+// Tabs Controller
+function setPanelTab(tab) {
+  currentPanelTab = tab;
+  document.querySelectorAll('.panel-tab').forEach(el => {
+    el.classList.toggle('active', el.dataset.tab === tab);
+  });
+  document.querySelectorAll('.panel-section').forEach(el => {
+    el.style.display = el.dataset.panel === tab ? '' : 'none';
+  });
+  if (tab === 'audit') {
+    loadAudit();
+  }
+  if (tab === 'modernized') {
+    loadArtifactsExplorer();
+  }
+}
+
+// Log streaming isolation
+let logSource = null;
+let currentLogId = null;
+let logAutoScroll = true;
+
+let lastProcessedSequence = 0;
+
+function setupLogStream(runId) {
+  if (logSource && currentLogId === runId) {
+    return;
+  }
+  closeLogStream();
+  currentLogId = runId;
+  lastProcessedSequence = 0;
+  const lw = $('logWindow');
+  if (lw) lw.innerHTML = '<div style="color:var(--acc2);">Initializing SSE log stream...</div>';
+  
+  logSource = new EventSource(`/api/log-stream?run_id=${encodeURIComponent(runId)}`);
+  logSource.onmessage = function(e) {
+    const ev = JSON.parse(e.data);
+    if (ev.seq && ev.seq <= lastProcessedSequence) {
+      return;
+    }
+    if (ev.seq) {
+      lastProcessedSequence = ev.seq;
+    }
+    if (ev.type === 'log') {
+      if (lw) {
+        const el = document.createElement('div');
+        if (ev.restart_boundary) {
+          el.className = 'log-restart-divider';
+          el.style.borderTop = '2px dashed var(--acc2)';
+          el.style.borderBottom = '2px dashed var(--acc2)';
+          el.style.padding = '8px 0';
+          el.style.margin = '12px 0';
+          el.style.color = 'var(--acc2)';
+          el.style.fontFamily = 'sans-serif';
+          el.style.fontWeight = 'bold';
+        }
+        el.innerHTML = colorLog(ev.message);
+        lw.appendChild(el);
+        if (logAutoScroll) {
+          lw.scrollTop = lw.scrollHeight;
+        }
+      }
+    } else {
+      poll();
+    }
+  };
+  logSource.addEventListener('end', function() {
+    closeLogStream();
+    if ($('connBadge')) $('connBadge').textContent = 'Disconnected';
+  });
+  logSource.onerror = function() {
+    closeLogStream();
+    if ($('connBadge')) $('connBadge').textContent = 'Disconnected';
+  };
+}
+
+function closeLogStream() {
+  if (logSource) {
+    logSource.close();
+    logSource = null;
+  }
+  currentLogId = null;
+}
+
+function clearLogs() {
+  const lw = $('logWindow');
+  if (lw) lw.innerHTML = '<div style="color:var(--muted);">Logs cleared locally.</div>';
+}
+
+function toggleAutoScroll(el) {
+  logAutoScroll = el.checked;
+}
+
+function colorLog(line) {
+  let cls = 'log-line-info';
+  if (/\[PASS\]/i.test(line) || /done:/i.test(line)) cls = 'log-line-ok';
+  else if (/\[(WARN|MISSING|PARTIAL)\]/i.test(line) || /warning/i.test(line)) cls = 'log-line-warn';
+  else if (/\[(FAIL|ERROR)\]/i.test(line) || /failed/i.test(line) || /exception/i.test(line)) cls = 'log-line-err';
+  return `<span class="${cls}">${escapeHtml(line)}</span>`;
+}
+
+// Explorer Loader
+async function loadArtifactsExplorer() {
+  const list = $('explorerFilesList');
+  if (!list) return;
+  list.innerHTML = '<div style="color:var(--muted); font-size:11px; padding:8px;">Loading artifacts...</div>';
+  try {
+    const res = await api(`/api/artifacts?run_id=${encodeURIComponent(sel)}`);
+    if (res.ok) {
+      if (!res.artifacts || res.artifacts.length === 0) {
+        list.innerHTML = '<div style="color:var(--muted); font-size:11px; padding:8px;">No artifacts found.</div>';
+        return;
+      }
+      
+      // Group artifacts by directories for tree display
+      let reportNodes = [];
+      let generatedNodes = [];
+      let executionNodes = [];
+      let modernizedNodes = [];
+      
+      res.artifacts.forEach(art => {
+        const itemHtml = `
+          <div class="tree-node" onclick="viewArtifactContent('${escapeJs(art.path)}', this)">
+            📄 ${escapeHtml(art.name)}
+          </div>`;
+        if (art.type === 'report') reportNodes.push(itemHtml);
+        else if (art.type === 'generated') generatedNodes.push(itemHtml);
+        else if (art.type === 'execution') executionNodes.push(itemHtml);
+        else if (art.type === 'modernized') modernizedNodes.push(itemHtml);
+      });
+      
+      list.innerHTML = `
+        <div class="tree-dir">📁 Reports / Target</div>
+        ${reportNodes.join('') || '<div style="color:var(--dim); padding-left:12px; font-size:10px;">None</div>'}
+        
+        <div class="tree-dir">📁 Generated Schemas</div>
+        ${generatedNodes.join('') || '<div style="color:var(--dim); padding-left:12px; font-size:10px;">None</div>'}
+        
+        <div class="tree-dir">📁 Execution Outputs</div>
+        ${executionNodes.join('') || '<div style="color:var(--dim); padding-left:12px; font-size:10px;">None</div>'}
+        
+        <div class="tree-dir">📁 Modernized Spring App</div>
+        ${modernizedNodes.join('') || '<div style="color:var(--dim); padding-left:12px; font-size:10px;">None</div>'}
+      `;
+      
+      const firstNode = list.querySelector('.tree-node');
+      if (firstNode) firstNode.click();
+    } else {
+      list.innerHTML = `<div style="color:var(--err); font-size:11px; padding:8px;">Error: ${escapeHtml(res.error)}</div>`;
+    }
+  } catch(e) {
+    list.innerHTML = `<div style="color:var(--err); font-size:11px; padding:8px;">Error: ${escapeHtml(e.message)}</div>`;
+  }
+}
+
+async function viewArtifactContent(path, el) {
+  path = decodeJs(path); // onclick handlers pass encoded values (XSS-safe)
+  document.querySelectorAll('.tree-node').forEach(node => node.classList.remove('active'));
+  if (el) el.classList.add('active');
+  
+  $('explorerFileHeader').innerHTML = `<span>📄 ${escapeHtml(path)}</span>
+    <a href="/api/artifact-content?run_id=${encodeURIComponent(sel)}&name=${encodeURIComponent(path)}" class="report-btn" target="_blank">Download</a>`;
+  
+  const codeWin = $('explorerCodeWindow');
+  codeWin.textContent = 'Retrieving file content...';
+  
+  try {
+    const res = await api(`/api/artifact-content?run_id=${encodeURIComponent(sel)}&name=${encodeURIComponent(path)}`);
+    if (res.ok) {
+      if (path.endsWith('.json')) {
+        try {
+          codeWin.textContent = JSON.stringify(JSON.parse(res.content), null, 2);
+        } catch(e) {
+          codeWin.textContent = res.content;
+        }
+      } else {
+        codeWin.textContent = res.content;
+      }
+    } else {
+      codeWin.textContent = res.error || 'Artifact not available for this run.';
+    }
+  } catch(e) {
+    codeWin.textContent = 'Artifact not available for this run. Error: ' + e.message;
+  }
+}
+
+// Audit Tree Loader
+async function loadAudit() {
+  const content = $('auditTabContent');
+  if (!content) return;
+  content.innerHTML = '<div style="color:var(--muted); text-align:center; padding:16px;">Loading dependencies...</div>';
+  try {
+    const res = await api(`/api/deps?run_id=${encodeURIComponent(sel)}`);
+    if (res.ok) {
+      renderAuditPanel(res);
+    } else {
+      content.innerHTML = `<div class="stage-detail">${escapeHtml(res.error || 'Failed to load dependencies')}</div>`;
+    }
+  } catch(e) {
+    content.innerHTML = `<div class="stage-detail">${escapeHtml(e.message)}</div>`;
+  }
+}
+
+function renderAuditPanel(d) {
+  const el = $('auditTabContent');
+  if (!el) return;
+
+  const arch = d.analyze || {};
+  const archHtml = arch.programs_count ? `
+    <div style="background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:14px 18px; margin-bottom:20px;">
+      <div style="font-size:10px; font-weight:700; color:var(--muted); text-transform:uppercase; margin-bottom:10px; letter-spacing:0.08em;">Architecture Mappings</div>
+      <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:12px; margin-bottom:12px;">
+        <div style="text-align:center;"><div style="font-size:22px; font-weight:700; color:var(--acc2);">${arch.programs_count || 0}</div><div style="font-size:11px; color:var(--muted);">Programs</div></div>
+        <div style="text-align:center;"><div style="font-size:22px; font-weight:700; color:#10b981;">${escapeHtml(arch.entry_point || '—')}</div><div style="font-size:11px; color:var(--muted);">Entry Point</div></div>
+        <div style="text-align:center;"><div style="font-size:22px; font-weight:700; color:#f59e0b;">${escapeHtml(arch.format || '—')}</div><div style="font-size:11px; color:var(--muted);">Format</div></div>
+        <div style="text-align:center;"><div style="font-size:22px; font-weight:700; color:#8b5cf6;">${(arch.call_graph && arch.call_graph.roots ? arch.call_graph.roots.length : 0)}</div><div style="font-size:11px; color:var(--muted);">Call Roots</div></div>
+      </div>
+      ${arch.missing_copybooks && arch.missing_copybooks.length ? `
+        <div style="margin-top:8px; font-size:11px; color:var(--warn);">⚠️ ${arch.missing_copybooks.length} unresolved copybook references</div>
+      ` : `<div style="margin-top:8px; font-size:11px; color:var(--ok);">✓ All copybook references resolved</div>`}
+    </div>` : '';
+
+  const cp = d.copy_deps || {};
+  const cov = d.copybook_coverage || {};
+  let copyHtml = `<div class="section-title">COPYBOOK Relationships</div>`;
+  let anyCopy = false;
+  for (const [src, copies] of Object.entries(cp)) {
+    if (!copies.length) continue;
+    anyCopy = true;
+    const srcCov = cov[src] || {};
+    const foundMap = {};
+    (srcCov.found||[]).forEach(f => foundMap[f.ref.toUpperCase()] = f.path);
+    copyHtml += `<div style="font-family:'JetBrains Mono',monospace; font-size:12px; margin-bottom:4px;">📄 ${escapeHtml(src)}</div>`;
+    copies.forEach(c => {
+      const p = foundMap[c.toUpperCase()];
+      copyHtml += `<div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted); padding-left:20px; border-left:1px solid var(--border2); margin-bottom:3px;">
+        ${p ? '✅' : '❌'} COPY <code>${escapeHtml(c)}</code> ${p ? '→ ' + escapeHtml(p) : '<span style="color:var(--err)">MISSING</span>'}
+      </div>`;
+    });
+  }
+  if (!anyCopy) copyHtml += '<div style="color:var(--muted); font-size:11px; margin-bottom:20px;">No COPYBOOK references found.</div>';
+  else copyHtml += '<br>';
+
+  const cg = d.call_graph || {};
+  const graph = cg.graph || {};
+  let callHtml = `<div class="section-title">CALL Graph</div>`;
+  let anyCall = false;
+  for (const [prog, deps] of Object.entries(graph)) {
+    if (!deps.static?.length && !deps.dynamic?.length) continue;
+    anyCall = true;
+    callHtml += `<div style="font-family:'JetBrains Mono',monospace; font-size:12px; margin-bottom:4px;">🔷 ${escapeHtml(prog)}</div>`;
+    (deps.static||[]).forEach(c => {
+      callHtml += `<div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted); padding-left:20px; border-left:1px solid var(--border2); margin-bottom:3px;">
+        → CALL <code>${escapeHtml(c)}</code> <span style="font-size:9px; color:var(--ok);">(static)</span>
+      </div>`;
+    });
+    (deps.dynamic||[]).forEach(c => {
+      callHtml += `<div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted); padding-left:20px; border-left:1px solid var(--border2); margin-bottom:3px;">
+        → CALL <code>${escapeHtml(c)}</code> <span style="font-size:9px; color:var(--warn);">(DYNAMIC — review required)</span>
+      </div>`;
+    });
+  }
+  if (!anyCall) callHtml += '<div style="color:var(--muted); font-size:11px; margin-bottom:20px;">No static or dynamic program calls found.</div>';
+
+  el.innerHTML = archHtml + copyHtml + callHtml;
+}
+
+// Render active run dashboard
+function renderActiveWorkspace(r) {
+  const container = $('mainContainer');
+  activeRunData = r;
+
+  // 1. Final Verdict calculations
+  const verd = (r.status === 'done') ? (r.verdict || 'UNVERIFIED') : (r.status === 'error' ? 'FAILED' : 'UNVERIFIED');
+  let bannerCls = 'chip-ready';
+  let verdictStyle = 'border-color: var(--border);';
+  let verdictDesc = 'No pipeline evidence has been produced yet. Run the modernization pipeline to execute the validation steps.';
+  
+  if (verd === 'PASS' || verd === 'PRODUCTION_READY' || verd === 'VERIFIED') {
+    bannerCls = 'chip-done';
+    verdictStyle = 'border-color: var(--ok); background: var(--ok-bg);';
+    verdictDesc = '✅ PASS: All core compiler and functional parity tests have passed successfully. Zero runtime emulation dependencies detected.';
+  } else if (verd === 'PASS_WITH_LIMITATIONS' || verd === 'VERIFIED_WITH_LIMITATIONS') {
+    bannerCls = 'chip-interrupted';
+    verdictStyle = 'border-color: var(--warn); background: var(--warn-bg);';
+    verdictDesc = '⚠️ PASS WITH LIMITATIONS: All core validation checks passed, but structural differences (such as physical VSAM vs relational database storage layout) require manual schema confirmation.';
+  } else if (verd === 'FAILED' || verd === 'PARTIAL') {
+    bannerCls = 'chip-error';
+    verdictStyle = 'border-color: var(--err); background: var(--err-bg);';
+    verdictDesc = '❌ FAILED: Modernization checks or compiler compilation tests failed, or functional equivalence matches showed difference.';
+  } else if (verd === 'BLOCKED' || verd === 'ENVIRONMENT_BLOCKED') {
+    bannerCls = 'chip-error';
+    verdictStyle = 'border-color: var(--err); background: var(--err-bg);';
+    verdictDesc = '🚫 BLOCKED: Pipeline execution cannot continue. A critical tool or environment dependency is missing or failed.';
+  } else if (verd === 'UNSUPPORTED') {
+    bannerCls = 'chip-interrupted';
+    verdictStyle = 'border-color: var(--warn); background: var(--warn-bg);';
+    verdictDesc = '⚠️ UNSUPPORTED: The program utilizes unsupported COBOL features (e.g. CICS transaction controllers, SQL database blocks) which require manual modernization review.';
+  } else if (verd === 'MANUAL_REVIEW') {
+    bannerCls = 'chip-interrupted';
+    verdictStyle = 'border-color: var(--warn); background: var(--warn-bg);';
+    verdictDesc = '🔍 MANUAL REVIEW: Code has been modernized, but verification requires manual auditing and user confirmation.';
+  } else if (verd === 'UNVERIFIED' || verd === 'EQUIVALENCE_UNVERIFIED') {
+    bannerCls = 'chip-ready';
+    verdictStyle = 'border-color: var(--border);';
+    verdictDesc = '❓ UNVERIFIED: Baseline or target executions have not completed or compared successfully. Behavior verification is unverified.';
+  } else if (verd === 'BASELINE_UNPRODUCIBLE') {
+    bannerCls = 'chip-error';
+    verdictStyle = 'border-color: var(--err);';
+    verdictDesc = '❌ BASELINE UNPRODUCIBLE: The legacy COBOL baseline could not be reproduced in the configured execution environment.';
+  }
+
+  // Get pipeline status and mapping
+  const runStatus = r.status || 'ready';
+  let statusText = 'NOT STARTED';
+  let statusChipCls = 'chip-ready';
+  let statusInfoBoxHtml = '';
+  
+  if (runStatus === 'running') {
+    statusText = 'RUNNING';
+    statusChipCls = 'chip-running';
+    statusInfoBoxHtml = `<div class="status-info-box info">⚡ Pipeline is currently running. Verdict reflects evidence collected so far.</div>`;
+  } else if (runStatus === 'done') {
+    statusText = 'COMPLETED';
+    statusChipCls = 'chip-done';
+    statusInfoBoxHtml = `<div class="status-info-box success">✓ Pipeline completed successfully. Final verdict is based on completed validation evidence.</div>`;
+  } else if (runStatus === 'interrupted') {
+    statusText = 'CANCELLED';
+    statusChipCls = 'chip-interrupted';
+    statusInfoBoxHtml = `<div class="status-info-box error" style="background:var(--warn-bg); border-color:var(--warn); color:var(--warn);">🚫 Pipeline execution cancelled by user.</div>`;
+  } else if (runStatus === 'error') {
+    statusText = 'FAILED';
+    statusChipCls = 'chip-error';
+    const failedStage = r.stages.find(s => s.status === 'error');
+    const failedStageName = failedStage ? failedStage.label : 'Execution';
+    statusInfoBoxHtml = `<div class="status-info-box error">❌ Pipeline terminated during stage: ${escapeHtml(failedStageName)}.</div>`;
+  }
+
+  let failureDetailsHtml = '';
+  if (runStatus === 'error' || runStatus === 'interrupted') {
+    const failedStage = r.stages.find(s => s.status === 'error') || r.stages.find(s => s.status === 'cancelled');
+    const failedStageName = failedStage ? failedStage.label : (runStatus === 'interrupted' ? 'Cancelled Stage' : 'Unknown Stage');
+    const failedStageErrors = failedStage && failedStage.errors && failedStage.errors.length 
+      ? failedStage.errors.join('\n') 
+      : (failedStage?.detail || (runStatus === 'interrupted' ? 'Pipeline cancelled by user request.' : 'No detailed error logs available.'));
+      
+    // Read GnuCOBOL baseline status
+    const buildRc = r.legacy && r.legacy.build_rc !== undefined ? r.legacy.build_rc : 'N/A';
+    const buildStderr = r.legacy && r.legacy.build_stderr_tail ? r.legacy.build_stderr_tail.trim() : '';
+    
+    // Recommended action based on stage or status
+    let recAction = 'Fix the issue and rerun the pipeline.';
+    if (runStatus === 'interrupted') {
+      recAction = 'Rerun the pipeline from any stage to resume execution.';
+    } else if (verd === 'BASELINE_UNPRODUCIBLE') {
+      recAction = 'Verify that the legacy source files do not contain syntax errors, ensure that all required copybooks are included in the upload, and check GnuCOBOL path configurations.';
+    } else if (failedStageName === 'Execute') {
+      recAction = 'Inspect the runtime stack trace above. Ensure that input files are present in the repository, database schema migration is successful, and execution settings match runtime targets.';
+    } else if (failedStageName === 'Transpile') {
+      recAction = 'Check the transpilation logs above. Verify if any unsupported COBOL features or proprietary extensions caused the transcompiler to fail.';
+    }
+    
+    failureDetailsHtml = `
+      <div class="failure-details-box" style="margin-top: 12px; padding: 12px; background: ${runStatus === 'interrupted' ? 'rgba(245,158,11,0.05)' : 'rgba(244,63,94,0.05)'}; border: 1px solid ${runStatus === 'interrupted' ? 'rgba(245,158,11,0.2)' : 'rgba(244,63,94,0.2)'}; border-radius: 6px;">
+        <div style="font-weight: 700; color: ${runStatus === 'interrupted' ? 'var(--warn)' : 'var(--err)'}; margin-bottom: 8px; font-size: 13px;">${runStatus === 'interrupted' ? '🚫 Cancellation Details' : '❌ Failure Details & Diagnostics'}</div>
+        <div style="display: grid; grid-template-columns: 180px 1fr; gap: 8px 16px; font-family: sans-serif; font-size: 12px;">
+          <div style="font-weight: 600; color: var(--muted);">${runStatus === 'interrupted' ? 'Cancelled Stage:' : 'Failed Stage:'}</div>
+          <div style="color: var(--txt);">${escapeHtml(failedStageName)}</div>
+          
+          <div style="font-weight: 600; color: var(--muted);">Pipeline Status:</div>
+          <div style="color: ${runStatus === 'interrupted' ? 'var(--warn)' : 'var(--err)'}; font-weight: 700;">${runStatus === 'interrupted' ? 'CANCELLED' : 'FAILED'}</div>
+
+          <div style="font-weight: 600; color: var(--muted);">Modernization Verdict:</div>
+          <div style="color: var(--txt); font-weight: 600;">${escapeHtml(verd)}</div>
+
+          <div style="font-weight: 600; color: var(--muted);">Failure Detail:</div>
+          <div style="color: var(--txt);">${escapeHtml(failedStage?.detail || 'Execution encountered an error')}</div>
+          
+          <div style="font-weight: 600; color: var(--muted);">Legacy Baseline Status:</div>
+          <div style="color: var(--txt);">GnuCOBOL build_rc: ${buildRc} ${buildStderr ? ' (Build Errors Detected)' : ''}</div>
+          
+          ${buildStderr ? `
+            <div style="font-weight: 600; color: var(--muted); grid-column: 1;">Compiler Error:</div>
+            <div style="grid-column: 1 / span 2; margin-top: 4px; padding: 8px; background: rgba(0,0,0,0.2); border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 11px; white-space: pre-wrap; color: #fda4af; max-height: 120px; overflow-y: auto;">${escapeHtml(buildStderr)}</div>
+          ` : ''}
+
+          ${failedStageErrors && failedStageErrors !== (failedStage?.detail || '') ? `
+            <div style="font-weight: 600; color: var(--muted); grid-column: 1;">Stage Errors:</div>
+            <div style="grid-column: 1 / span 2; margin-top: 4px; padding: 8px; background: rgba(0,0,0,0.2); border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 11px; white-space: pre-wrap; color: #fda4af; max-height: 120px; overflow-y: auto;">${escapeHtml(failedStageErrors)}</div>
+          ` : ''}
+          
+          <div style="font-weight: 600; color: var(--muted); margin-top: 4px;">Downstream Stages:</div>
+          <div style="color: var(--warn); margin-top: 4px; font-weight: 600;">NOT EXECUTED (Skipped)</div>
+          
+          <div style="font-weight: 600; color: var(--muted); margin-top: 4px;">Recommended Action:</div>
+          <div style="color: #67e8f9; font-weight: 600; margin-top: 4px;">${escapeHtml(recAction)}</div>
+        </div>
+      </div>
+    `;
+  }
+
+
+  // 2. Map 13 Backend Stages
+  const stepsHtml = r.stages.map(s => {
+    const st = s.status || 'pending';
+    const statusText = st.toUpperCase();
+    const detail = (st === 'done' || st === 'error') && s.detail
+      ? `<div class="stage-detail">${escapeHtml(s.detail)}</div>` : '';
+    return `
+      <div class="stage-step ${st}">
+        <div class="stage-num">${s.index + 1}</div>
+        <div style="flex:1;">
+          <div class="stage-title">${escapeHtml(s.label)}</div>
+          <div class="stage-desc">${escapeHtml(s.desc)}</div>
+          ${detail}
+        </div>
+        <span class="stage-status-badge">${statusText}</span>
+      </div>`;
+  }).join('');
+
+  // 3. 7 Evidence Cards details
+  const rdata = r.data || {};
+  const compileData = rdata.generate || {};
+  const execData = rdata.execute || {};
+  const compareData = rdata.compare || {};
+  const depData = (rdata.collect || {}).dependency_audit || {};
+  const negData = rdata.neg_equiv || {};
+  const traceData = rdata.validate || {};
+  const diagData = rdata.analyze || {};
+
+  function getCardStatus(val, type) {
+    if (type === 'compilation') {
+      const gStage = r.stages.find(s => s.label === 'Generate') || {};
+      if (gStage.status === 'done') return { text: 'PASS', cls: 'chip-done', metrics: 'Maven Clean Compile' };
+      if (gStage.status === 'error') return { text: 'FAIL', cls: 'chip-error', metrics: 'Build Fail' };
+      return { text: 'UNVERIFIED', cls: 'chip-ready', metrics: 'Pending' };
+    }
+    if (type === 'execution') {
+      const eStage = r.stages.find(s => s.label === 'Execute') || {};
+      if (eStage.status === 'done') return { text: 'PASS', cls: 'chip-done', metrics: `Exit code: ${execData.rc !== undefined ? execData.rc : '0'}` };
+      if (eStage.status === 'error') return { text: 'FAIL', cls: 'chip-error', metrics: 'Execution Fail' };
+      return { text: 'UNVERIFIED', cls: 'chip-ready', metrics: 'Pending' };
+    }
+    if (type === 'equivalence') {
+      const cStage = r.stages.find(s => s.label === 'Compare') || {};
+      if (cStage.status === 'done') {
+        const pass = compareData.status === 'PASS';
+        const hasDiff = compareData.verdict_counts && compareData.verdict_counts.differ > 0;
+        if (pass && hasDiff) {
+          return { text: 'LOGICAL MATCH', cls: 'chip-interrupted', metrics: 'Physical differences normalized' };
+        }
+        return { text: pass ? 'PASS' : 'FAIL', cls: pass ? 'chip-done' : 'chip-error', metrics: `${compareData.rows ? compareData.rows.length : 0} outputs compared` };
+      }
+      if (cStage.status === 'error') return { text: 'FAIL', cls: 'chip-error', metrics: 'Mismatch error' };
+      return { text: 'UNVERIFIED', cls: 'chip-ready', metrics: 'Pending' };
+    }
+    if (type === 'dep_audit') {
+      if (depData.executed) {
+        const pass = depData.status === 'PASS' || depData.verdict === 'PASS';
+        return { text: pass ? 'PASS' : 'FAIL', cls: pass ? 'chip-done' : 'chip-error', metrics: `${depData.forbidden_found ? depData.forbidden_found.length : 0} issues` };
+      }
+      if (r.status === 'done') return { text: 'SKIPPED', cls: 'chip-ready', metrics: 'Not Executed' };
+      return { text: 'UNVERIFIED', cls: 'chip-ready', metrics: 'Pending' };
+    }
+    if (type === 'neg_equiv') {
+      if (negData.executed) {
+        const pass = negData.status === 'PASS' || negData.verdict === 'PASS';
+        return { text: pass ? 'PASS' : 'FAIL', cls: pass ? 'chip-done' : 'chip-error', metrics: `${negData.mutations_tested || 0} mutants checked` };
+      }
+      if (compareData.topology === 'CONSOLE_OUTPUT' || compareData.topology === 'NO_OBSERVABLE_OUTPUT') {
+        return { text: 'SKIPPED', cls: 'chip-ready', metrics: 'Topology restricted' };
+      }
+      if (r.status === 'done') return { text: 'SKIPPED', cls: 'chip-ready', metrics: 'Not Executed' };
+      return { text: 'UNVERIFIED', cls: 'chip-ready', metrics: 'Pending' };
+    }
+    if (type === 'traceability') {
+      const vStage = r.stages.find(s => s.label === 'Validate') || {};
+      if (vStage.status === 'done') {
+        const pass = traceData.gate2_passed;
+        return { text: pass ? 'PASS' : 'FAIL', cls: pass ? 'chip-done' : 'chip-error', metrics: `H2 JPA Mappings OK` };
+      }
+      if (vStage.status === 'error') return { text: 'FAIL', cls: 'chip-error', metrics: 'Validation Mismatch' };
+      return { text: 'UNVERIFIED', cls: 'chip-ready', metrics: 'Pending' };
+    }
+    if (type === 'diagnostics') {
+      const aStage = r.stages.find(s => s.label === 'Analyze') || {};
+      if (aStage.status === 'done') {
+        const unsup = diagData.unsupported_count || 0;
+        return { text: unsup === 0 ? 'PASS' : 'WARNING', cls: unsup === 0 ? 'chip-done' : 'chip-interrupted', metrics: `${unsup} stubs` };
+      }
+      if (aStage.status === 'error') return { text: 'FAIL', cls: 'chip-error', metrics: 'Analysis Fail' };
+      return { text: 'UNVERIFIED', cls: 'chip-ready', metrics: 'Pending' };
+    }
+    return { text: 'UNVERIFIED', cls: 'chip-ready', metrics: 'Pending' };
+  }
+
+  const cStatus = getCardStatus(compileData, 'compilation');
+  const eStatus = getCardStatus(execData, 'execution');
+  const eqStatus = getCardStatus(compareData, 'equivalence');
+  const dStatus = getCardStatus(depData, 'dep_audit');
+  const nStatus = getCardStatus(negData, 'neg_equiv');
+  const tStatus = getCardStatus(traceData, 'traceability');
+  const dgStatus = getCardStatus(diagData, 'diagnostics');
+
+  // 4. Build controls state
+  let defaultRestartIdx = r.last_stage + 1;
+  if (r.status === 'error') {
+    const failedStage = r.stages.find(s => s.status === 'error');
+    if (failedStage) defaultRestartIdx = failedStage.index;
+  }
+  const selectOpts = r.stages.map(s =>
+    `<option value="${s.index}" ${s.index === defaultRestartIdx ? 'selected' : ''}>${s.index} - ${s.label}</option>`
+  ).join('');
+
+  const isDone = r.status === 'done';
+  const contText = isDone ? 'Re-run all' : (r.last_stage >= 0 ? 'Continue' : 'Run pipeline');
+  const contIdx = isDone ? 0 : defaultRestartIdx;
+
+  // 5. Build Equivalence Panel content
+  let equivDetailsHtml = '';
+  if (compareData.topology) {
+    const isTimeout = r.error && (r.error.includes("ExecutionTimeout") || r.error.includes("TIMEOUT"));
+    const isOutputLimit = r.error && (r.error.includes("OutputLimitExceeded") || r.error.includes("LIMIT"));
+    
+    let negEquivWarning = '';
+    if (!negData.executed && (compareData.topology === 'CONSOLE_OUTPUT' || compareData.topology === 'NO_OBSERVABLE_OUTPUT')) {
+      negEquivWarning = `
+        <div style="background:var(--warn-bg); border:1px solid rgba(245,158,11,0.2); border-radius:6px; padding:10px; color:var(--warn); font-size:11px; margin-top:10px;">
+          ⚠️ Negative equivalence could not be executed for this topology.
+        </div>`;
+    }
+    
+    equivDetailsHtml = `
+      <div class="equiv-grid">
+        <div class="equiv-card">
+          <div class="equiv-card-header">⚖️ Runtime Topology & Parity</div>
+          <div class="equiv-field-row">
+            <div class="equiv-label">Topology:</div>
+            <div class="equiv-val">${escapeHtml(compareData.topology || 'N/A')}</div>
+            
+            <div class="equiv-label">Equivalence Mode:</div>
+            <div class="equiv-val">${escapeHtml(compareData.equivalence_mode || 'N/A')}</div>
+            
+            <div class="equiv-label">Comparison Status:</div>
+            <div class="equiv-val" style="color:${compareData.status === 'PASS' ? 'var(--ok)' : 'var(--err)'}">${escapeHtml(compareData.status || 'N/A')}</div>
+
+            <div class="equiv-label">Legacy Exit Code:</div>
+            <div class="equiv-val">${r.legacy && r.legacy.run_rc !== undefined ? r.legacy.run_rc : 'N/A'}</div>
+
+            <div class="equiv-label">Java Exit Code:</div>
+            <div class="equiv-val">${r.execute && r.execute.rc !== undefined ? r.execute.rc : 'N/A'}</div>
+
+            <div class="equiv-label">Output Normalization:</div>
+            <div class="equiv-val">${compareData.stdout_truncated ? 'Stdout Tail (Truncated)' : 'Full match'}</div>
+          </div>
+        </div>
+
+        <div class="equiv-card">
+          <div class="equiv-card-header">🧬 Mutation Testing (Negative Equivalence)</div>
+          <div class="equiv-field-row">
+            <div class="equiv-label">Mutations Tested:</div>
+            <div class="equiv-val">${negData.mutations_tested || 0}</div>
+
+            <div class="equiv-label">Mutations Caught:</div>
+            <div class="equiv-val" style="color:var(--ok);">${negData.mutations_caught || 0}</div>
+
+            <div class="equiv-label">Negative Equiv Status:</div>
+            <div class="equiv-val" style="color:${negData.status === 'PASS' ? 'var(--ok)' : 'var(--muted)'}">${escapeHtml(negData.status || 'N/A')}</div>
+            
+            <div class="equiv-label">Reason:</div>
+            <div class="equiv-val">${escapeHtml(negData.reason || 'N/A')}</div>
+          </div>
+          ${negEquivWarning}
+        </div>
+      </div>
+    `;
+  } else {
+    equivDetailsHtml = `<div style="color:var(--muted); text-align:center; padding:24px;">Parity verification evidence will be displayed once the comparison stage runs.</div>`;
+  }
+
+  // 6. Reports list mapping
+  let reportsHtml = `
+    <div class="reports-grid">
+      <div class="report-card">
+        <div>
+          <div class="report-title">📄 Migration Verification Report</div>
+          <p class="report-meta">Authoritative markdown report highlighting codebase verification checkpoints and issues.</p>
+        </div>
+        <div class="report-actions">
+          <button class="report-btn" onclick="viewArtifactContent('migration-report.md')">View</button>
+          <a class="report-btn" href="/report?run_id=${encodeURIComponent(r.run_id)}" target="_blank">Download</a>
+        </div>
+      </div>
+
+      <div class="report-card">
+        <div>
+          <div class="report-title">📋 Pipeline Execution Manifest</div>
+          <p class="report-meta">Machine-readable JSON execution manifest documenting compilation, dependency scans, and parity verdicts.</p>
+        </div>
+        <div class="report-actions">
+          <button class="report-btn" onclick="viewArtifactContent('pipeline_execution_manifest.json')">View</button>
+          <a class="report-btn" href="/api/report-json?run_id=${encodeURIComponent(r.run_id)}&file=pipeline_execution_manifest.json" target="_blank">Download</a>
+        </div>
+      </div>
+
+      <div class="report-card">
+        <div>
+          <div class="report-title">🧩 Traceability Report</div>
+          <p class="report-meta">Traceability matrix showing copybook schema structures and JPA model class alignments.</p>
+        </div>
+        <div class="report-actions">
+          <button class="report-btn" onclick="viewArtifactContent('business-rule-traceability.md')">View</button>
+        </div>
+      </div>
+
+      <div class="report-card">
+        <div>
+          <div class="report-title">🔍 Diagnostics Report</div>
+          <p class="report-meta">Diagnostics audit scan capturing syntax warnings, stubs, and call-graph structure analysis.</p>
+        </div>
+        <div class="report-actions">
+          <button class="report-btn" onclick="viewArtifactContent('generated/native_translation_diagnostics.json')">View</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Start log streaming if run is active
+  if (r.status === 'running') {
+    setupLogStream(r.run_id);
+    if ($('connBadge')) {
+      $('connBadge').textContent = 'Live Streaming';
+      $('connBadge').style.color = 'var(--acc2)';
+    }
+  } else {
+    closeLogStream();
+    if ($('connBadge')) {
+      $('connBadge').textContent = 'Offline';
+      $('connBadge').style.color = 'var(--muted)';
+    }
+  }
+
+  // Shell switcher
+  const shellNeeded = renderedView !== r.run_id || !document.getElementById('runsListSidebar');
+  if (shellNeeded) {
+    renderedView = r.run_id;
+    container.innerHTML = `
+      <div class="app-container">
+        <!-- Sidebar runs -->
+        <div class="sidebar">
+          <div class="sidebar-header">
+            <h3>Workspaces / Runs</h3>
+          </div>
+          <div class="runs-list" id="runsListSidebar">
+            <!-- Runs populates here -->
+          </div>
+        </div>
+
+        <!-- Main Dashboard View -->
+        <div class="content-area">
+          
+          <!-- Final Verdict Panel -->
+          <div class="verdict-panel" style="${verdictStyle}"></div>
+
+          <!-- Controls panel -->
+          <div class="controls-panel"></div>
+
+          <!-- Summary & Evidence Cards Grid -->
+          <div class="summary-grid">
+            <!-- Repository Card -->
+            <div class="repo-card"></div>
+
+            <!-- Evidence Cards Grid -->
+            <div class="evidence-grid"></div>
+          </div>
+
+          <!-- Bottom Tabs panels -->
+          <div class="tabs-card">
+            <div class="tabs-header">
+              <div class="panel-tab ${currentPanelTab === 'pipeline' ? 'active' : ''}" data-tab="pipeline" onclick="setPanelTab('pipeline')">📋 Pipeline Stages</div>
+              <div class="panel-tab ${currentPanelTab === 'audit' ? 'active' : ''}" data-tab="audit" onclick="setPanelTab('audit')">🔍 Dependencies</div>
+              <div class="panel-tab ${currentPanelTab === 'equiv' ? 'active' : ''}" data-tab="equiv" onclick="setPanelTab('equiv')">⚖️ Equivalence & Parity</div>
+              <div class="panel-tab ${currentPanelTab === 'modernized' ? 'active' : ''}" data-tab="modernized" onclick="setPanelTab('modernized')">📁 Unified Explorer</div>
+              <div class="panel-tab ${currentPanelTab === 'reports' ? 'active' : ''}" data-tab="reports" onclick="setPanelTab('reports')">📊 Report Center</div>
+              <div class="panel-tab ${currentPanelTab === 'log' ? 'active' : ''}" data-tab="log" onclick="setPanelTab('log')">📟 Console Log</div>
+            </div>
+
+            <!-- Stepper stages list tab -->
+            <div class="panel-body panel-section" data-panel="pipeline" style="${currentPanelTab !== 'pipeline' ? 'display:none' : ''}">
+              <div class="stage-steps"></div>
+            </div>
+
+            <!-- Dependencies graph view tab -->
+            <div class="panel-body panel-section" data-panel="audit" style="${currentPanelTab !== 'audit' ? 'display:none' : ''}">
+              <div id="auditTabContent">Loading dependencies...</div>
+            </div>
+
+            <!-- Equivalence details tab -->
+            <div class="panel-body panel-section" data-panel="equiv" style="${currentPanelTab !== 'equiv' ? 'display:none' : ''}"></div>
+
+            <!-- Unified Explorer tab -->
+            <div class="panel-body panel-section" data-panel="modernized" style="${currentPanelTab !== 'modernized' ? 'display:none' : ''}">
+              <div class="explorer-grid">
+                <div class="tree-panel" id="explorerFilesList">Loading files tree...</div>
+                <div class="code-panel">
+                  <div class="code-header" id="explorerFileHeader">Select a file to preview</div>
+                  <pre class="code-window" id="explorerCodeWindow"></pre>
+                </div>
+              </div>
+            </div>
+
+            <!-- Report Center tab -->
+            <div class="panel-body panel-section" data-panel="reports" style="${currentPanelTab !== 'reports' ? 'display:none' : ''}"></div>
+
+            <!-- Console logs tab -->
+            <div class="panel-body panel-section" data-panel="log" style="${currentPanelTab !== 'log' ? 'display:none' : ''}">
+              <div class="log-toolbar">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <label><input type="checkbox" checked onchange="toggleAutoScroll(this)"> Auto-scroll</label>
+                  <button class="control-btn" onclick="clearLogs()" style="padding:3px 10px; font-size:11px;">Clear Screen</button>
+                </div>
+                <div>Connection Status: <strong id="connBadge" style="color:var(--muted);">Offline</strong></div>
+              </div>
+              <div class="log-window" id="logWindow"></div>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  // Dynamic refresh updates in both modes:
+  const bannerBox = document.querySelector('.verdict-panel');
+  if (bannerBox) {
+    bannerBox.style = verdictStyle;
+    bannerBox.innerHTML = `
+      <div class="verdict-header">
+        <div style="font-weight:700; font-size:15px;">Modernization Certification Verdict</div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <span class="verdict-status-badge ${statusChipCls}">Status: ${statusText}</span>
+          <span class="verdict-badge ${bannerCls}">${escapeHtml(verd)}</span>
+        </div>
+      </div>
+      <div class="verdict-desc">${escapeHtml(verdictDesc)}</div>
+      ${statusInfoBoxHtml}
+      ${failureDetailsHtml}
+    `;
+  }
+  
+  const repoCard = document.querySelector('.repo-card');
+  if (repoCard) {
+    repoCard.innerHTML = `
+      <div class="section-title">📂 Repository Summary</div>
+      <div class="repo-metric-row">
+        <div class="repo-metric"><span class="repo-label">Workspace Name:</span><span class="repo-val">${escapeHtml(r.name || 'N/A')}</span></div>
+        <div class="repo-metric"><span class="repo-label">Detected Format:</span><span class="repo-val">${escapeHtml(rdata.discover?.format || 'N/A')}</span></div>
+        <div class="repo-metric"><span class="repo-label">COBOL Programs:</span><span class="repo-val">${rdata.discover?.programs ? rdata.discover.programs.length : 'N/A'}</span></div>
+        <div class="repo-metric"><span class="repo-label">Discovered Copybooks:</span><span class="repo-val">${rdata.discover?.all_copybooks ? rdata.discover.all_copybooks.length : 'N/A'}</span></div>
+        <div class="repo-metric"><span class="repo-label">Entry Point:</span><span class="repo-val">${escapeHtml(rdata.discover?.entry || 'N/A')}</span></div>
+        <div class="repo-metric"><span class="repo-label">Pipeline Status:</span><span class="repo-val" style="color:var(--acc2);">${escapeHtml(r.status ? r.status.toUpperCase() : 'N/A')}</span></div>
+      </div>
+    `;
+  }
+
+  const controlsPanel = document.querySelector('.controls-panel');
+  if (controlsPanel) {
+    controlsPanel.innerHTML = `
+      <button class="control-btn primary" ${runStatus === 'running' ? 'disabled' : ''} onclick="runIt(${contIdx})">${contText}</button>
+      <button class="control-btn" ${runStatus === 'running' ? 'disabled' : ''} onclick="runIt(Number($('stageSelect').value))">Re-run from</button>
+      <select id="stageSelect" class="control-select" ${runStatus === 'running' ? 'disabled' : ''}>${selectOpts}</select>
+      <button class="control-btn" onclick="stopPipeline()">Stop</button>
+      <button class="control-btn danger" ${runStatus === 'running' ? 'disabled' : ''} onclick="resetRun()">Reset Workspace</button>
+      
+      <div style="margin-left:auto; display:flex; gap:12px; align-items:center;">
+        ${r.manifest_exists ? `<a href="/api/report-json?run_id=${encodeURIComponent(r.run_id)}&file=pipeline_execution_manifest.json" class="report-btn" target="_blank">View Manifest</a>` : ''}
+        ${r.package_size != null ? `<a href="/package?run_id=${encodeURIComponent(r.run_id)}" class="report-btn" style="background:var(--acc-grad); color:#fff;" target="_blank">Download ZIP</a>` : ''}
+      </div>
+    `;
+  }
+
+  const stepsList = document.querySelector('.stage-steps');
+  if (stepsList) {
+    stepsList.innerHTML = stepsHtml;
+  }
+
+  const evidenceGrid = document.querySelector('.evidence-grid');
+  if (evidenceGrid) {
+    evidenceGrid.innerHTML = `
+      <div class="evidence-card">
+        <div class="evidence-card-header"><span class="evidence-card-title">1. Compilation</span><span class="evidence-badge ${cStatus.cls}">${cStatus.text}</span></div>
+        <p class="evidence-desc">Compiles the scaffolded Java classes via Maven validation.</p>
+        <div class="evidence-metrics">${cStatus.metrics}</div>
+      </div>
+      
+      <div class="evidence-card">
+        <div class="evidence-card-header"><span class="evidence-card-title">2. Execution</span><span class="evidence-badge ${eStatus.cls}">${eStatus.text}</span></div>
+        <p class="evidence-desc">Executes the modernized batch application in the sandboxed JRE.</p>
+        <div class="evidence-metrics">${eStatus.metrics}</div>
+      </div>
+
+      <div class="evidence-card">
+        <div class="evidence-card-header"><span class="evidence-card-title">3. Equivalence</span><span class="evidence-badge ${eqStatus.cls}">${eqStatus.text}</span></div>
+        <p class="evidence-desc">Compares the legacy baseline outputs against Java outputs (Gate 1).</p>
+        <div class="evidence-metrics">${eqStatus.metrics}</div>
+      </div>
+
+      <div class="evidence-card">
+        <div class="evidence-card-header"><span class="evidence-card-title">4. Dependency Audit</span><span class="evidence-badge ${dStatus.cls}">${dStatus.text}</span></div>
+        <p class="evidence-desc">Scans final classes to confirm zero references to legacy runtime packages.</p>
+        <div class="evidence-metrics">${dStatus.metrics}</div>
+      </div>
+
+      <div class="evidence-card">
+        <div class="evidence-card-header"><span class="evidence-card-title">5. Neg Equivalence</span><span class="evidence-badge ${nStatus.cls}">${nStatus.text}</span></div>
+        <p class="evidence-desc">Runs mutation validation checking if output diverges under record changes.</p>
+        <div class="evidence-metrics">${nStatus.metrics}</div>
+      </div>
+
+      <div class="evidence-card">
+        <div class="evidence-card-header"><span class="evidence-card-title">6. Traceability</span><span class="evidence-badge ${tStatus.cls}">${tStatus.text}</span></div>
+        <p class="evidence-desc">Verifies refactored JPA models and Spring batch loading parity (Gate 2).</p>
+        <div class="evidence-metrics">${tStatus.metrics}</div>
+      </div>
+
+      <div class="evidence-card">
+        <div class="evidence-card-header"><span class="evidence-card-title">7. Diagnostics</span><span class="evidence-badge ${dgStatus.cls}">${dgStatus.text}</span></div>
+        <p class="evidence-desc">Traverses syntax warnings, stubbed targets, and call-graphs.</p>
+        <div class="evidence-metrics">${dgStatus.metrics}</div>
+      </div>
+    `;
+  }
+
+  const equivPanel = document.querySelector('[data-panel="equiv"]');
+  if (equivPanel) {
+    equivPanel.innerHTML = equivDetailsHtml;
+  }
+
+  const reportsPanel = document.querySelector('[data-panel="reports"]');
+  if (reportsPanel) {
+    reportsPanel.innerHTML = reportsHtml;
+  }
+
+  // Reload logs viewport if stable
+  if (!logSource) {
+    const lw = $('logWindow');
+    if (lw) {
+      lw.innerHTML = '';
+      (r.events || []).forEach(ev => {
+        if (ev.type === 'log') {
+          const el = document.createElement('div');
+          if (ev.restart_boundary) {
+            el.className = 'log-restart-divider';
+            el.style.borderTop = '2px dashed var(--acc2)';
+            el.style.borderBottom = '2px dashed var(--acc2)';
+            el.style.padding = '8px 0';
+            el.style.margin = '12px 0';
+            el.style.color = 'var(--acc2)';
+            el.style.fontFamily = 'sans-serif';
+            el.style.fontWeight = 'bold';
+          }
+          el.innerHTML = colorLog(ev.message);
+          lw.appendChild(el);
+        }
+      });
+      if (logAutoScroll) lw.scrollTop = lw.scrollHeight;
+    }
+  }
+
+  // Refresh runs in sidebar
+  api('/api/state').then(renderRuns);
+}
+
+function renderRuns(state) {
+  const sidebar = $('runsListSidebar');
+  if (!sidebar) return;
+  if (!state.runs.length) {
+    sidebar.innerHTML = '<div style="color:var(--muted); padding:16px; font-size:12px; text-align:center;">No workspaces created yet</div>';
+    return;
+  }
+  sidebar.innerHTML = state.runs.map(r => {
+    let chipClass = `chip chip-${r.status}`;
+    let doneCount = r.stages.filter(s => s.status === 'done').length;
+    return `
+      <div class="run-item ${r.run_id === sel ? 'active' : ''}" onclick="selectRun('${escapeJs(r.run_id)}')">
+        <div class="run-title">${escapeHtml(r.name || r.run_id)} <span class="${chipClass}">${r.status}</span></div>
+        <div class="run-meta">${doneCount}/${r.stages.length} stages · ${escapeHtml(r.verdict || 'UNVERIFIED')}</div>
+      </div>`;
+  }).join('');
+}
+
+function renderDefaultUploadScreen(state) {
+  const container = $('mainContainer');
+  
+  if (state.runs.length) {
+    container.innerHTML = `
+      <div class="app-container">
+        <!-- Sidebar runs -->
+        <div class="sidebar">
+          <div class="sidebar-header">
+            <h3>Workspaces / Runs</h3>
+          </div>
+          <div class="runs-list" id="runsListSidebar">
+            <!-- Runs list populates here -->
+          </div>
+        </div>
+
+        <!-- Center Upload Screen inside content-area -->
+        <div class="content-area" style="align-items:center; justify-content:center; flex:1;">
+          <div class="upload-card">
+            <h2>Select Modernization Input Source</h2>
+            <p>Provide your legacy assets. You can upload a project ZIP archive, or clone directly from a Git repository.</p>
+            
+            <div class="tab-row">
+              <button class="tab-btn ${inTab === 'zip' ? 'active' : ''}" id="tabUpload" onclick="setInTab('zip')">Upload File / ZIP</button>
+              <button class="tab-btn ${inTab === 'git' ? 'active' : ''}" id="tabClone" onclick="setInTab('git')">Clone Git Repository</button>
+            </div>
+
+            <div id="zipInputBox" style="${inTab !== 'zip' ? 'display:none' : ''}">
+              <div class="dropzone" id="dropZone">
+                <input type="file" id="zipFile" accept=".zip" onchange="onFileSelected(this)">
+                <div class="dropzone-icon">📦</div>
+                <div class="dropzone-text">Drag & drop your ZIP here, or <span>browse</span></div>
+              </div>
+              <div class="selected-file-box" id="fileSelectedBox" style="display:none">
+                <div class="selected-file-info">
+                  <span>📦</span>
+                  <span id="fileName"></span>
+                  <span style="color:var(--muted); font-size:11px;" id="fileSize"></span>
+                </div>
+                <button class="btn-clear" onclick="clearSelectedFile()">Clear</button>
+              </div>
+            </div>
+
+            <div id="gitInputBox" style="${inTab !== 'git' ? 'display:none' : ''}">
+              <div style="display:flex; flex-direction:column; gap:12px;">
+                <div class="field">
+                  <label style="display:block; font-size:11px; color:var(--muted); margin-bottom:4px;">Git Repository URL</label>
+                  <input type="text" id="gitUrl" placeholder="https://github.com/org/repo.git" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border2); background:var(--surface2); color:var(--text); font-size:13px; outline:none;">
+                </div>
+                <div class="field">
+                  <label style="display:block; font-size:11px; color:var(--muted); margin-bottom:4px;">Branch (optional)</label>
+                  <input type="text" id="gitBranch" placeholder="main" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border2); background:var(--surface2); color:var(--text); font-size:13px; outline:none;">
+                </div>
+              </div>
+            </div>
+
+            <div class="action-btn-row">
+              <button class="btn-action" id="analyzeBtn" onclick="ingest()">Analyze Project Source →</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    
+    renderRuns(state);
+  } else {
+    container.innerHTML = `
+      <div class="center-container">
+        <div class="upload-card">
+          <h2>Select Modernization Input Source</h2>
+          <p>Provide your legacy assets. You can upload a project ZIP archive, or clone directly from a Git repository.</p>
+          
+          <div class="tab-row">
+            <button class="tab-btn ${inTab === 'zip' ? 'active' : ''}" id="tabUpload" onclick="setInTab('zip')">Upload File / ZIP</button>
+            <button class="tab-btn ${inTab === 'git' ? 'active' : ''}" id="tabClone" onclick="setInTab('git')">Clone Git Repository</button>
+          </div>
+
+          <div id="zipInputBox" style="${inTab !== 'zip' ? 'display:none' : ''}">
+            <div class="dropzone" id="dropZone">
+              <input type="file" id="zipFile" accept=".zip" onchange="onFileSelected(this)">
+              <div class="dropzone-icon">📦</div>
+              <div class="dropzone-text">Drag & drop your ZIP here, or <span>browse</span></div>
+            </div>
+            <div class="selected-file-box" id="fileSelectedBox" style="display:none">
+              <div class="selected-file-info">
+                <span>📦</span>
+                <span id="fileName"></span>
+                <span style="color:var(--muted); font-size:11px;" id="fileSize"></span>
+              </div>
+              <button class="btn-clear" onclick="clearSelectedFile()">Clear</button>
+            </div>
+          </div>
+
+          <div id="gitInputBox" style="${inTab !== 'git' ? 'display:none' : ''}">
+            <div style="display:flex; flex-direction:column; gap:12px;">
+              <div class="field">
+                <label style="display:block; font-size:11px; color:var(--muted); margin-bottom:4px;">Git Repository URL</label>
+                <input type="text" id="gitUrl" placeholder="https://github.com/org/repo.git" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border2); background:var(--surface2); color:var(--text); font-size:13px; outline:none;">
+              </div>
+              <div class="field">
+                <label style="display:block; font-size:11px; color:var(--muted); margin-bottom:4px;">Branch (optional)</label>
+                <input type="text" id="gitBranch" placeholder="main" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border2); background:var(--surface2); color:var(--text); font-size:13px; outline:none;">
+              </div>
+            </div>
+          </div>
+
+          <div class="action-btn-row">
+            <button class="btn-action" id="analyzeBtn" onclick="ingest()">Analyze Project Source →</button>
+          </div>
+        </div>
+      </div>`;
+  }
+}
+
+// State Poller
+async function poll() {
+  try {
+    const state = await api('/api/state');
+    const r = state.runs.find(x => x.run_id === sel);
+
+    if (r) {
+      const statusChanged = prevRunStatus !== null && prevRunStatus !== r.status;
+      if (renderedView !== r.run_id || r.status === 'running' || statusChanged) {
+        prevRunStatus = r.status;
+        renderActiveWorkspace(r);
+      } else {
+        renderRuns(state);
+      }
+    } else {
+      prevRunStatus = null;
+      if (renderedView !== 'upload') {
+        renderedView = 'upload';
+        renderDefaultUploadScreen(state);
+      } else {
+        renderRuns(state);
+      }
+    }
+    $('backendStatus').textContent = 'Active Connection';
+    $('backendStatus').style.color = 'var(--ok)';
+  } catch(e) {
+    console.error('Poller error: ', e);
+    $('backendStatus').textContent = 'API Connection Error';
+    $('backendStatus').style.color = 'var(--err)';
+  }
+}
+
+poll();
+setInterval(poll, 2000);
+</script>
+</body>
+</html>

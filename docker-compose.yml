@@ -1,0 +1,86 @@
+services:
+  cobol-modernizer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: cobol-modernizer:latest
+    container_name: cobol-modernizer
+    ports:
+      - "8787:8787"
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      # Pipeline output — generated Java, compiled classes, migration reports
+      - workspace:/app/workspace
+      # Maven local repo cache — persists between restarts so deps aren't re-downloaded
+      - maven-cache:/root/.m2
+      # Mount Docker socket to allow pipeline to run sub-containers (DooD)
+      # - /var/run/docker.sock:/var/run/docker.sock
+      # Mount client certificates inside the container if using remote TLS Docker
+      # - ${DOCKER_CERT_PATH:-/dev/null}:/certs:ro
+      # Mount source repos you want to modernize from host into container
+      # Uncomment and point to your COBOL repo:
+      # - C:/path/to/your/cobol-repo:/input:ro
+    environment:
+      # Optional: point to a real DB2 instance
+      # DB2_URL: jdbc:db2://your-db2-host:50000/MYDB
+      # DB2_USER: db2user
+      # DB2_PASSWORD: secret
+      # Optional: CICS endpoint
+      # CICS_HOST: your-cics-host
+      # CICS_PORT: 2006
+      PYTHONUNBUFFERED: "1"
+      DOCKER_NETWORK: cobol-to-java-test_default
+      UI_AUTH_CREDENTIALS: "admin:admin"
+      DOCKER_HOST: "${DOCKER_HOST:-}"
+      DOCKER_TLS_VERIFY: "${DOCKER_TLS_VERIFY:-}"
+      DOCKER_CERT_PATH: "${DOCKER_CERT_PATH:-}"
+    command: ["python", "ui.py", "--host", "0.0.0.0", "--port", "8787"]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8787/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  db2:
+    image: icr.io/db2_community/db2:11.5.8.0
+    container_name: db2
+    profiles:
+      - db2
+    privileged: true
+    environment:
+      - LICENSE=accept
+      - DB2INSTANCE=db2inst1
+      - DB2INST1_PASSWORD=secret
+      - DBNAME=SAMPLE
+    ports:
+      - "50000:50000"
+    healthcheck:
+      test: ["CMD-SHELL", "su - db2inst1 -c 'db2gcf -s' | grep -q 'Active'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  workspace:
+    driver: local
+  maven-cache:
+    driver: local

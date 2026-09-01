@@ -1,0 +1,19 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. POINTERS01.
+       
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01  MY-PTR    USAGE POINTER.
+       01  WS-VAR    PIC X(5) VALUE "HELLO".
+       
+       LINKAGE SECTION.
+       01  LS-VAR    PIC X(5).
+
+       PROCEDURE DIVISION.
+       MAIN-PARA.
+           SET MY-PTR TO ADDRESS OF WS-VAR.
+           SET ADDRESS OF LS-VAR TO MY-PTR.
+           DISPLAY "LS-VAR BEFORE: " LS-VAR.
+           MOVE "WORLD" TO LS-VAR.
+           DISPLAY "WS-VAR AFTER: " WS-VAR.
+           GOBACK.

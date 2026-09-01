@@ -1,0 +1,11 @@
+tables:
+  - name: CUSTOMER
+    columns:
+      - name: CUST_ID
+        type: INTEGER
+        primary_key: true
+      - name: CUST_NAME
+        type: VARCHAR(20)
+    rows:
+      - [101, "TEST CUSTOMER       "]
+      - [102, "ANOTHER CUST        "]

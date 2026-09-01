@@ -1,0 +1,13 @@
+{
+  "repository_name": "ACCTPROG",
+  "description": "Adversarial transaction processing repository with non-standard paths",
+  "source_dir": "src",
+  "copybook_dirs": ["copybooks"],
+  "data_in_dir": "data",
+  "data_out_dir": "data",
+  "main_program": "ACCTPROG",
+  "file_assignments": {
+    "SOURCE-FILE": "data/raw-source-data.bin",
+    "RESULT-FILE": "data/final-result-report.txt"
+  }
+}

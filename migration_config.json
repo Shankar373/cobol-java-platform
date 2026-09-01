@@ -1,0 +1,65 @@
+{
+  "repo": "legacy",
+  "execution": {
+    "timeout_seconds": 120,
+    "max_output_bytes": 5242880,
+    "interactive_scenario": null
+  },
+  "out": "target",
+  "legacy_exclude_sources": ["CCLEGACYX.cob"],
+  "manual_source_modifications": [
+    {
+      "file": "src/CCPROC01.cob",
+      "reason": "MANUAL SOURCE MODIFICATION",
+      "before_hash": "UNKNOWN_original_not_preserved",
+      "after_hash": "3ac7548dab0e790f97a7831851acce06296a12b7031a16a73e09050a78481da2",
+      "timestamp": "2026-08-18T16:34:00Z",
+      "note": "Original pre-modification hash was incorrectly recorded as SHA-256 of empty string (e3b0c44...). The actual pre-modification source was not preserved. Current file hash matches after_hash."
+    }
+  ],
+  "compare": {
+    "output_dirs": ["data/out", "data/work"],
+    "modes": {
+      "data/out/eod-claims-report.txt": "normalized"
+    },
+    "semantic_comparators": {
+      "data/out/claim-audit.dat": {"type": "pipe_records", "note": "pipe-delimited records with numeric amount field"},
+      "data/out/eod-claims-report.txt": {
+        "type": "labeled_counts",
+        "labels": {
+          "AUDIT RECORDS": "audit",
+          "EXCEPTIONS": "exc",
+          "MANUAL REVIEWS": "review"
+        }
+      }
+    },
+    "checks": [
+      {
+        "file": "data/out/claim-audit.dat",
+        "kind": "comp3",
+        "sep": "|",
+        "field": 3,
+        "byte_len": 7,
+        "expect": ["95000.00", "35000.00", "295000.00", "300000.00"]
+      },
+      {
+        "file": "data/out/eod-claims-report.txt",
+        "kind": "regex",
+        "regex": "(?m)^AUDIT RECORDS\\s*:\\s*(\\d+)",
+        "expect": "4"
+      },
+      {
+        "file": "data/out/eod-claims-report.txt",
+        "kind": "regex",
+        "regex": "(?m)^EXCEPTIONS\\s*:\\s*(\\d+)",
+        "expect": "3"
+      },
+      {
+        "file": "data/out/eod-claims-report.txt",
+        "kind": "regex",
+        "regex": "(?m)^MANUAL REVIEWS\\s*:\\s*(\\d+)",
+        "expect": "2"
+      }
+    ]
+  }
+}

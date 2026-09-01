@@ -1,0 +1,14 @@
+{
+  "overall_status": "PASS",
+  "native_java": "PROVEN",
+  "benchmark_independence": "PROVEN",
+  "compilation": "PASS",
+  "execution": "PASS",
+  "equivalence": "PASS",
+  "features_verified": 30,
+  "features_partial": 3,
+  "features_unsupported": 9,
+  "applications_verified": 7,
+  "applications_failed": 0,
+  "applications_unverified": 1
+}

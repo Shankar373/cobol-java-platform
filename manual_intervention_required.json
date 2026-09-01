@@ -1,0 +1,46 @@
+{
+  "audit_standard": "Phase 12 Unified Modernization Platform",
+  "generated_at": "2026-09-01T15:05:00Z",
+  "items": [
+    {
+      "issue": "IMS_DLI_HIERARCHICAL_DATABASE",
+      "source_pattern": "CALL 'CBLTDLI', 'ASMTDLI', 'PLITDLI', EXEC DLI",
+      "reason": "Mainframe IMS hierarchical database navigation is unsupported in native relational/Spring target.",
+      "impact": "Code generation halted via fail-closed diagnostic NATIVE_TRANSLATION_BLOCKED.",
+      "required_action": "Design relational schema (PostgreSQL) with foreign key parent-child relationships or document store, and refactor procedural DL/I calls into Spring Data repositories.",
+      "priority": "HIGH"
+    },
+    {
+      "issue": "IBM_MQ_MESSAGING_INTEGRATION",
+      "source_pattern": "CALL 'MQCONN', 'MQOPEN', 'MQPUT', 'MQGET', 'MQCLOSE', 'MQDISC'",
+      "reason": "Native IBM MQ API calls are unsupported in pure Track B open-source target.",
+      "impact": "Code generation halted via fail-closed diagnostic NATIVE_TRANSLATION_BLOCKED.",
+      "required_action": "Configure Spring JMS (JmsTemplate) or Spring Cloud Stream with Apache ActiveMQ Artemis or Apache Kafka.",
+      "priority": "HIGH"
+    },
+    {
+      "issue": "EBCDIC_CUSTOM_COLLATION_SORTING",
+      "source_pattern": "PROGRAM COLLATING SEQUENCE IS EBCDIC",
+      "reason": "Modernized Java runs on standard JVM ASCII/UTF-8 character collations.",
+      "impact": "Non-numeric sorting order differs from mainframe EBCDIC binary representations.",
+      "required_action": "Review business rules dependent on EBCDIC collation (e.g. letters preceding numbers) and configure custom Java Comparators if required.",
+      "priority": "MEDIUM"
+    },
+    {
+      "issue": "REAL_CICS_DIRECT_FILE_CONTROL",
+      "source_pattern": "EXEC CICS READ DATASET(...), WRITE DATASET(...), STARTBR",
+      "reason": "Direct CICS dataset file operations are currently unsupported in online transaction contexts.",
+      "impact": "Emits CICS_UNSUPPORTED_COMMAND diagnostic at parse time.",
+      "required_action": "Map dataset access to Spring Boot Data repositories or CobolIndexedFile runtime helpers.",
+      "priority": "MEDIUM"
+    },
+    {
+      "issue": "DISTRIBUTED_XA_TWO_PHASE_COMMIT",
+      "source_pattern": "EXEC CICS SYNCPOINT across DB2 and MQ/IMS",
+      "reason": "Distributed 2PC transactions across heterogeneous mainframe resources are unsupported.",
+      "impact": "Atomicity across multiple data sources cannot be guaranteed without an external transaction manager.",
+      "required_action": "Consolidate into single-resource relational transactions or adopt Saga / Outbox patterns.",
+      "priority": "HIGH"
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+cobc (GnuCOBOL) 3.1.2.0
+Copyright (C) 2020 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+Written by Keisuke Nishida, Roger While, Ron Norman, Simon Sobisch, Edward Hart
+Built     Feb 20 2024 03:18:19
+Packaged  Dec 23 2020 12:04:58 UTC
+C version "13.2.1 20231014"
+
+build information
+build environment        : x86_64-pc-linux-musl
+CC                       : gcc
+C version                : "13.2.1 20231014"
+CPPFLAGS                 : 
+CFLAGS                   : -O2 -pipe -finline-functions -fsigned-char
+                           -Wall -Wwrite-strings -Wmissing-prototypes
+                           -Wno-format-y2k
+LD                       : /usr/x86_64-alpine-linux-musl/bin/ld
+LDFLAGS                  :  -Wl,-z,relro,-z,now,-O1
+
+GnuCOBOL information
+COB_CC                   : gcc
+COB_CFLAGS               : -pipe -I/usr/local/include -Wno-unused
+                           -fsigned-char -Wno-pointer-sign
+COB_DEBUG_FLAGS          : -ggdb3 -fasynchronous-unwind-tables
+COB_LDFLAGS              : 
+COB_LIBS                 : -L/usr/local/lib -lcob -lm
+COB_CONFIG_DIR           : /usr/local/share/gnucobol/config
+COB_COPY_DIR             : /usr/local/share/gnucobol/copy
+COB_MSG_FORMAT           : GCC
+COB_OBJECT_EXT           : o
+COB_MODULE_EXT           : so
+COB_EXE_EXT              : 
+64bit-mode               : yes
+BINARY-C-LONG            : 8 bytes
+endianness               : little-endian
+native EBCDIC            : no
+extended screen I/O      : ncurses
+variable file format     : 0
+sequential file handler  : built-in
+indexed file handler     : BDB
+mathematical library     : GMP
+XML library              : libxml2
+JSON library             : cjson

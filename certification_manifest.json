@@ -1,0 +1,63 @@
+{
+  "platform": "Unified Universal COBOL-to-Java Modernization Platform",
+  "version": "12.0.0",
+  "certification_date": "2026-09-01T15:05:00Z",
+  "overall_verdict": "PARTIAL",
+  "universality_verdict": {
+    "automated_discovery_and_transformation": "YES",
+    "universal_mainframe_business_equivalence": "PARTIAL"
+  },
+  "toolchain": {
+    "engine": "Python 3.14 / Deterministic AST & Semantic IR",
+    "runtime": "Java 17 / Spring Boot 3.2.3 / Spring JDBC",
+    "target_database": "PostgreSQL 15+",
+    "build_system": "Apache Maven 3.9+"
+  },
+  "phases_certified": {
+    "phase1_zero_assumption_inventory": "COMPLETED",
+    "phase2_architecture_and_pipeline": "COMPLETED",
+    "phase3_ir_and_native_generator": "COMPLETED",
+    "phase4_vsam_and_file_parity": "E2E_PROVEN",
+    "phase5_jcl_batch_pipeline": "COMPATIBILITY_PROVEN",
+    "phase6_skill_architecture": "E2E_PROVEN",
+    "phase7_cics_bms_closure": "COMPATIBILITY_PROVEN",
+    "phase8_advanced_enterprise_cobol": "E2E_PROVEN",
+    "phase9_db2_enterprise_sql": "E2E_PROVEN_FOR_POSTGRES_TARGET",
+    "phase10_cics_enterprise_runtime": "COMPATIBILITY_PROVEN",
+    "phase11_ims_mq_integration_boundary": "UNSUPPORTED_FAIL_CLOSED",
+    "phase12_unified_certification": "COMPLETED"
+  },
+  "subsystem_capabilities": {
+    "cobol_core_language": "E2E_PROVEN",
+    "redefines_and_occurs": "E2E_PROVEN",
+    "sort_and_merge": "E2E_PROVEN",
+    "edited_picture_formatting": "E2E_PROVEN",
+    "vsam_ksds_indexed_files": "COMPATIBILITY_PROVEN",
+    "jcl_batch_steps": "COMPATIBILITY_PROVEN",
+    "db2_sql_on_postgresql": "E2E_PROVEN_FOR_POSTGRES_TARGET",
+    "cics_online_transactions": "COMPATIBILITY_PROVEN",
+    "bms_3270_screen_dtos": "COMPATIBILITY_PROVEN",
+    "multithreaded_concurrency": "COMPATIBILITY_PROVEN",
+    "real_ibm_zos_cics": "UNPROVEN",
+    "real_ibm_zos_db2": "UNPROVEN",
+    "real_ibm_3270_sna": "UNPROVEN",
+    "ims_dli_hierarchical_db": "UNSUPPORTED",
+    "ibm_mq_messaging": "UNSUPPORTED",
+    "ebcdic_custom_collation": "UNSUPPORTED"
+  },
+  "verification_gates": {
+    "GATE_1_ANALYSIS_READY": "PASS",
+    "GATE_2_GENERATION_READY": "PASS",
+    "GATE_3_BUILD_READY": "PASS",
+    "GATE_4_EXECUTION_READY": "PASS",
+    "GATE_5_EQUIVALENCE_READY": "PASS",
+    "GATE_6_PRODUCTION_CANDIDATE": "PASS",
+    "GATE_7_PRODUCTION_READY": "PARTIAL (Scoped to verified subset)"
+  },
+  "evidence_summary": {
+    "total_automated_tests": 400,
+    "test_pass_rate": "100%",
+    "zero_regression_verified": true,
+    "pure_open_source_compliance": true
+  }
+}

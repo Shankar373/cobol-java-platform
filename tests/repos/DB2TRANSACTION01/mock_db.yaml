@@ -1,0 +1,7 @@
+tables:
+  - name: DUMMY
+    columns:
+      - name: ID
+        type: INTEGER
+        primary_key: true
+    rows: []
