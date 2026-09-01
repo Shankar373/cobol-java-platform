@@ -2,8 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [master]
+    branches: [main, master]
   pull_request:
+    branches: [main, master]
   schedule:
     # Nightly full lane (Docker-dependent suites).
     - cron: "0 3 * * *"
